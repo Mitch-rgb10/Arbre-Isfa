@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arbre des familles — ISFA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1C2B39;
+    --ink-2:#3B4E5E;
+    --paper:#F1EEE4;
+    --paper-2:#E7E1D0;
+    --amber:#C68A34;
+    --amber-dark:#96691F;
+    --green:#3F6C4E;
+    --green-bg:#E4ECE4;
+    --rust:#B5533B;
+    --rust-bg:#F3E2DC;
+    --line:#D9D3C3;
+    --white:#FBFAF6;
+    --radius:3px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    line-height:1.5;
+  }
+  h1,h2,h3,h4{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    margin:0;
+    color:var(--ink);
+  }
+  a{color:var(--amber-dark);}
+  button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;font-size:14px;}
+
+  #app{max-width:1100px;margin:0 auto;padding:0 20px 80px;}
+
+  .topbar{
+    display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
+    padding:32px 0 0;
+    border-bottom:1px solid var(--line);
+    margin-bottom:28px;
+    gap:16px;
+  }
+  .brand{display:flex;align-items:center;gap:14px;}
+  .brand-mark{
+    width:44px;height:44px;border-radius:50%;
+    background:var(--ink);color:var(--paper);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-weight:600;font-size:16px;
+    flex-shrink:0;
+  }
+  .brand h1{font-size:22px;letter-spacing:-0.01em;}
+  .brand p{margin:2px 0 0;font-size:13px;color:var(--ink-2);}
+
+  .tabs{display:flex;gap:22px;padding-bottom:14px;}
+  .tab{
+    background:none;border:none;padding:6px 0;
+    font-size:14px;color:var(--ink-2);
+    border-bottom:2px solid transparent;
+    transition:color .15s;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:var(--ink);border-bottom-color:var(--amber);font-weight:600;}
+
+  .panel{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:24px;
+    margin-bottom:20px;
+  }
+  .intro{font-size:13.5px;color:var(--ink-2);margin:0 0 18px;max-width:66ch;}
+  .intro strong{color:var(--ink);}
+
+  .badge{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:34px;height:22px;padding:0 7px;
+    border-radius:11px;font-size:11.5px;font-weight:600;
+    background:var(--paper-2);color:var(--ink-2);
+    border:1px solid var(--line);
+  }
+  .badge.b1A{background:#EFE0C4;color:#7A5316;border-color:#DEC896;}
+  .badge.b2A{background:#E3E8D6;color:#4B6B2E;border-color:#CBD6B4;}
+  .badge.b3A{background:#DCE6E6;color:#2E6363;border-color:#BFD4D4;}
+  .badge.b4A{background:#DDE1EE;color:#3A4A8C;border-color:#C4CBE6;}
+  .badge.b5A{background:#EBDDE8;color:#733D6B;border-color:#DBC3D5;}
+  .badge.bDiplome{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  .badge.bAlumni{background:#4A3B5C;color:var(--paper);border-color:#4A3B5C;}
+
+  .pill{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:11px;
+  }
+  .pill.pending{background:var(--rust-bg);color:var(--rust);}
+  .pill.approved{background:var(--green-bg);color:var(--green);}
+  .pill.placeholder{background:#EDEAE0;color:var(--ink-2);border:1px dashed var(--line);}
+
+  /* Tree toolbar */
+  .tree-controls{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    margin-bottom:14px;
+  }
+  .tree-controls input[type=text]{
+    flex:1;min-width:200px;padding:9px 11px;
+    border:1px solid var(--line);border-radius:var(--radius);background:var(--white);
+  }
+  .tree-zoom{
+    display:inline-flex;align-items:center;gap:4px;
+    border:1px solid var(--line);border-radius:var(--radius);
+    padding:2px 4px;background:var(--white);
+  }
+  .tree-zoom .btn{padding:4px 10px;}
+  .tree-zoom-value{font-size:12.5px;color:var(--ink-2);min-width:44px;text-align:center;}
+  .tree-info{font-size:12px;color:var(--ink-2);margin-left:auto;}
+
+  /* Tree */
+  .tree-legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px;font-size:12.5px;color:var(--ink-2);align-items:center;}
+  .tree-legend span{display:inline-flex;align-items:center;gap:6px;}
+  .tree-svg-wrap{
+    overflow:auto;border:1px solid var(--line);border-radius:var(--radius);
+    background:var(--paper);padding:14px;
+    max-height:75vh;
+    position:relative;
+  }
+  .tree-link{stroke:var(--line);stroke-width:1.5;fill:none;}
+  .tree-link.dim{stroke:#E8E3D3;}
+  .tree-card{
+    width:100%;height:100%;box-sizing:border-box;
+    display:flex;flex-direction:column;justify-content:center;gap:4px;
+    background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
+    padding:8px 10px;font-family:'Inter',sans-serif;
+    transition:opacity .15s, box-shadow .15s, border-color .15s;
+  }
+  .tree-card-placeholder{border-style:dashed;background:var(--paper-2);}
+  .tree-card-main{display:flex;align-items:center;gap:7px;cursor:pointer;overflow:hidden;}
+  .tree-card-main:hover .tree-card-name{color:var(--amber-dark);}
+  .tree-card-name{font-weight:600;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .12s;}
+  .tree-card-name.placeholder-name{font-style:italic;font-weight:500;color:var(--ink-2);}
+  .tree-card-match{border-color:var(--amber);box-shadow:0 0 0 2px rgba(198,138,52,.35);}
+  .tree-card-dim{opacity:.28;}
+  .tree-toggle{
+    align-self:flex-start;border:1px solid var(--line);background:var(--paper);color:var(--ink-2);
+    font-size:10.5px;padding:1px 7px;border-radius:10px;
+  }
+  .tree-toggle:hover{background:var(--paper-2);color:var(--ink);}
+  .node-meta{font-size:12px;color:var(--ink-2);}
+
+  .empty{
+    text-align:center;padding:50px 20px;color:var(--ink-2);font-size:14px;
+  }
+
+  /* Directory */
+  .dir-controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;}
+  .dir-controls input, .dir-controls select{
+    padding:9px 11px;border:1px solid var(--line);border-radius:var(--radius);background:var(--white);
+  }
+  .dir-controls input{flex:1;min-width:180px;}
+  .dir-row{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:12px 10px;border-bottom:1px solid var(--line);cursor:pointer;
+  }
+  .dir-row:hover{background:var(--paper);}
+  .dir-row:last-child{border-bottom:none;}
+  .dir-left{display:flex;align-items:center;gap:12px;}
+  .dir-name{font-weight:600;}
+  .dir-sub{font-size:12.5px;color:var(--ink-2);}
+
+  /* Forms */
+  .form-section{margin-bottom:22px;}
+  .form-section h3{font-size:15px;margin-bottom:4px;}
+  .form-section .hint{font-size:12.5px;color:var(--ink-2);margin:0 0 12px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:5px;}
+  .field input[type=text], .field input[type=number], .field select, .field textarea{
+    width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:var(--radius);
+    background:var(--white);color:var(--ink);
+  }
+  .field textarea{resize:vertical;min-height:60px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:600px){.row2{grid-template-columns:1fr;}}
+  .checkline{display:flex;align-items:center;gap:8px;font-size:13.5px;}
+  .checkline input{width:auto;}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:10px 16px;border-radius:var(--radius);border:1px solid var(--ink);
+    background:var(--ink);color:var(--paper);font-size:13.5px;font-weight:600;
+    transition:opacity .12s;
+  }
+  .btn:hover{opacity:.88;}
+  .btn.secondary{background:transparent;color:var(--ink);border-color:var(--line);}
+  .btn.danger{background:var(--rust);border-color:var(--rust);}
+  .btn.small{padding:6px 11px;font-size:12.5px;}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+
+  .exp-card{
+    border:1px solid var(--line);border-radius:var(--radius);padding:13px;margin-bottom:10px;background:var(--paper);
+  }
+  .exp-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+
+  .search-picker{border:1px solid var(--line);border-radius:var(--radius);max-height:180px;overflow-y:auto;margin-top:6px;}
+  .search-picker-item{padding:8px 11px;font-size:13.5px;cursor:pointer;border-bottom:1px solid var(--line);}
+  .search-picker-item:last-child{border-bottom:none;}
+  .search-picker-item:hover{background:var(--paper);}
+  .parrain-chosen{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:9px 12px;border:1px solid var(--amber);background:#FBF3E5;border-radius:var(--radius);font-size:13.5px;
+  }
+
+  .warning-box{
+    border:1px solid var(--rust);background:var(--rust-bg);color:var(--rust);
+    padding:10px 13px;border-radius:var(--radius);font-size:13px;margin-bottom:14px;
+  }
+  .success-box{
+    border:1px solid var(--green);background:var(--green-bg);color:var(--green);
+    padding:14px 16px;border-radius:var(--radius);font-size:13.5px;margin-bottom:14px;
+  }
+  .error-text{color:var(--rust);font-size:12px;margin-top:4px;}
+
+  .filleul-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
+  .filleul-row input{flex:1;}
+
+  /* Modal */
+  #modal-root{position:fixed;inset:0;z-index:50;display:none;}
+  #modal-root.open{display:block;}
+  .modal-backdrop{position:absolute;inset:0;background:rgba(28,43,57,.55);}
+  .modal-box{
+    position:relative;max-width:560px;margin:60px auto;background:var(--white);
+    border-radius:var(--radius);padding:26px;max-height:80vh;overflow-y:auto;
+  }
+  .modal-close{position:absolute;top:18px;right:18px;background:none;border:none;font-size:20px;color:var(--ink-2);}
+  .modal-title{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+  .modal-sub{font-size:12.5px;color:var(--ink-2);margin-bottom:18px;}
+  .modal-block{margin-bottom:16px;}
+  .modal-block h4{font-size:12.5px;text-transform:none;color:var(--ink-2);font-weight:600;margin-bottom:8px;letter-spacing:.01em;}
+  .exp-view{padding:9px 0;border-top:1px solid var(--line);font-size:13.5px;}
+  .exp-view:first-of-type{border-top:none;}
+  .exp-view .role{font-weight:600;}
+  .exp-view .meta{color:var(--ink-2);font-size:12.5px;}
+  .locked-note{font-size:12px;color:var(--ink-2);font-style:italic;}
+
+  .admin-gate{max-width:340px;margin:40px auto;text-align:center;}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:22px;}
+  .stat-card{border:1px solid var(--line);border-radius:var(--radius);padding:14px;text-align:center;}
+  .stat-card .num{font-family:'Fraunces',serif;font-size:24px;font-weight:600;}
+  .stat-card .lbl{font-size:11.5px;color:var(--ink-2);}
+
+  .admin-item{border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:10px;}
+  .admin-item-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;}
+  .admin-actions{display:flex;gap:8px;margin-top:10px;}
+  .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+</style>
+<script src=https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js></script>
+<script src=https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js></script>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">IF</div>
+      <div>
+        <h1>Arbre des familles</h1>
+        <p>ISFA — parrainages &amp; réseau des anciens</p>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs"></nav>
+  </header>
+  <main id="view"></main>
+</div>
+<div id="modal-root"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* =========================================================================
+   CONFIG
+   Le mot de passe admin est stocké en SHA-256 (pas en clair).
+   Pour le changer :
+     1) choisis un nouveau mot de passe
+     2) calcule son SHA-256, par ex. en collant dans une console :
+        [...new Uint8Array(await crypto.subtle.digest('SHA-256',
+          new TextEncoder().encode('ton-nouveau-mdp')))]
+          .map(b=>b.toString(16).padStart(2,'0')).join('')
+     3) remplace ADMIN_PASSWORD_HASH ci-dessous
+   ========================================================================= */
+const ADMIN_PASSWORD_HASH = "26168ca5e7220b91e8f4be6474bfbd7c70c5f44dc3b0af484fb2fcdf2b15ef9d";
+const LOGIN_MAX_TRIES = 5;
+const LOGIN_LOCKOUT_MS = 5 * 60 * 1000;
+const SUBMIT_MIN_INTERVAL_MS = 10 * 1000;
+const MAX_EXPERIENCES = 20;
+const MAX_FILLEULS_DECLARES = 30;
+const STORE_KEY = "isfa_arbre_people_v1";
+// Import the functions you need from the SDKs you need
+
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCRd5RDzYnLhxVDxHhxuCIMNZoi3fBbdiY",
+  authDomain: "arbre-isfa.firebaseapp.com",
+  projectId: "arbre-isfa",
+  storageBucket: "arbre-isfa.firebasestorage.app",
+  messagingSenderId: "865276001825",
+  appId: "1:865276001825:web:369e3237d107ea38eead60"
+};
+
+// Initialize Firebase
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+const peopleCol = db.collection("people");
+const LEVELS = ["1A","2A","3A","4A","5A","Diplômé"];
+const FILIERES = ["Actuariat","Éco-stat","PME-PMI"];
+const EXP_TYPES = ["Stage","Alternance","CDI","CDD","Autre"];
+const NAME_RE = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,40}$/;
+const VALID_STATUSES = ["approved","pending","placeholder","rejected"];
+
+/* =========================================================================
+   STATE
+   ========================================================================= */
+let people = [];
+let currentTab = "arbre";
+let isAdmin = false;
+let dirQuery = "";
+let dirLevel = "";
+let dirFiliere = "";
+let joinForm = null; // working object for the join form
+let editingId = null; // admin editing an existing person
+let collapsedIds = new Set(); // branches repliées dans l'onglet Arbre
+let treeSearch = "";
+let treeZoom = 1;
+let _levelCache = new Map(); // cache par render pour effectiveLevelInfo
+let loginFailedAttempts = 0;
+let loginLockedUntil = 0;
+let lastSubmitAt = 0;
+
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+function esc(str){
+  return String(str ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function uid(){ return 'p_' + Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+async function sha256(text){
+  const buf = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest("SHA-256", buf);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+function isValidPersonRecord(p){
+  return p && typeof p === "object"
+    && typeof p.id === "string" && p.id.length > 0 && p.id.length < 100
+    && typeof p.prenom === "string" && p.prenom.length < 60
+    && typeof p.nom === "string" && p.nom.length < 60
+    && typeof p.level === "string" && LEVELS.includes(p.level)
+    && typeof p.status === "string" && VALID_STATUSES.includes(p.status);
+}
+
+/* =========================================================================
+   STORAGE
+   ========================================================================= */
+   async function loadPeople(){
+  try{
+    const snap = await peopleCol.get();
+    const raw = snap.docs.map(d => d.data());
+    people = raw.filter(isValidPersonRecord);
+  }catch(e){
+    console.error("Firestore load error:", e);
+    people = [];
+  }
+}
+
+
+
+
+async function savePeople(){
+  try{
+    // Un doc par personne, id du doc = id de la personne. Batch pour l'atomicité.
+    const batch = db.batch();
+    const snap = await peopleCol.get();
+    const existingIds = new Set(snap.docs.map(d => d.id));
+    const currentIds = new Set(people.map(p => p.id));
+    people.forEach(p => batch.set(peopleCol.doc(p.id), p));
+    existingIds.forEach(id => { if(!currentIds.has(id)) batch.delete(peopleCol.doc(id)); });
+    await batch.commit();
+  }catch(e){
+    console.error("Firestore save error:", e);
+    alert("Erreur d'enregistrement (Firestore). Réessaie dans un instant.");
+  }
+}
+
+/* =========================================================================
+   HELPERS
+   ========================================================================= */
+function levelBadgeClass(level){
+  if(level === "Diplômé") return "bDiplome";
+  return "b" + level;
+}
+function approvedPeople(){ return people.filter(p => p.status === "approved"); }
+function pendingPeople(){ return people.filter(p => p.status === "pending"); }
+function placeholderPeople(){ return people.filter(p => p.status === "placeholder"); }
+function visiblePeople(){ return people.filter(p => p.status === "approved" || p.status === "placeholder"); }
+function findPerson(id){ return people.find(p => p.id === id); }
+function fullName(p){ return `${p.prenom} ${p.nom}`; }
+function childrenOf(id){
+  return visiblePeople().filter(p => p.parrainId === id)
+    .sort((a,b)=> fullName(a).localeCompare(fullName(b)));
+}
+function roots(){
+  return visiblePeople().filter(p => !p.parrainId || !findPerson(p.parrainId))
+    .sort((a,b)=> fullName(a).localeCompare(fullName(b)));
+}
+
+// Niveau effectif : un Diplômé qui parraine un 5A devient "6A", son propre parrain "7A", etc.
+// Non-Diplômé garde son niveau stocké. Diplômé sans filleul reste "Diplômé".
+function effectiveLevelInfo(person){
+  if(!person) return { label:"?", badgeClass:"", promo:0 };
+  if(_levelCache.has(person.id)) return _levelCache.get(person.id);
+  // guard contre boucle éventuelle (parrainId qui pointe sur soi-même par erreur)
+  _levelCache.set(person.id, { label: person.level, badgeClass: levelBadgeClass(person.level), promo: parseInt(person.level,10) || 5 });
+  let info;
+  if(person.level !== "Diplômé"){
+    const n = parseInt(person.level,10); // "1A" -> 1
+    info = { label: person.level, badgeClass: levelBadgeClass(person.level), promo: n };
+  } else {
+    const kids = childrenOf(person.id);
+    if(kids.length === 0){
+      info = { label: "Diplômé", badgeClass: "bDiplome", promo: 5 };
+    } else {
+      let maxPromo = 0;
+      kids.forEach(k => {
+        const kInfo = effectiveLevelInfo(k);
+        if(kInfo.promo > maxPromo) maxPromo = kInfo.promo;
+      });
+      const N = Math.max(6, maxPromo + 1);
+      info = {
+        label: N + "A",
+        badgeClass: N <= 5 ? "b" + N + "A" : "bAlumni",
+        promo: N
+      };
+    }
+  }
+  _levelCache.set(person.id, info);
+  return info;
+}
+
+function nameTaken(prenom, nom, excludeId){
+  const p1 = prenom.trim().toLowerCase(), n1 = nom.trim().toLowerCase();
+  return people.some(p => p.id !== excludeId &&
+    p.status !== "rejected" &&
+    p.prenom.trim().toLowerCase() === p1 &&
+    p.nom.trim().toLowerCase() === n1);
+}
+// filleuls déclarés par quelqu'un d'autre (status "placeholder") dont le nom correspond
+function placeholderMatches(prenom, nom){
+  const p1 = prenom.trim().toLowerCase(), n1 = nom.trim().toLowerCase();
+  if(!p1 || !n1) return [];
+  return placeholderPeople().filter(ph =>
+    ph.prenom.trim().toLowerCase() === p1 && ph.nom.trim().toLowerCase() === n1);
+}
+// fiches déjà validées ou en attente (pas des placeholders) avec le même nom — doublon potentiel
+function existingRealMatches(prenom, nom, excludeId){
+  const p1 = prenom.trim().toLowerCase(), n1 = nom.trim().toLowerCase();
+  if(!p1 || !n1) return [];
+  return people.filter(p => p.id !== excludeId &&
+    (p.status === "approved" || p.status === "pending") &&
+    p.prenom.trim().toLowerCase() === p1 && p.nom.trim().toLowerCase() === n1);
+}
+
+/* =========================================================================
+   RENDER — SHELL
+   ========================================================================= */
+function renderTabs(){
+  const tabs = [
+    ["arbre","Arbre"],
+    ["annuaire","Annuaire"],
+    ["rejoindre","Rejoindre une famille"],
+    ["admin","Admin"],
+  ];
+  $("#tabs").innerHTML = tabs.map(([id,label]) =>
+    `<button class="tab ${currentTab===id?'active':''}" data-tab="${id}">${label}</button>`
+  ).join("");
+}
+
+function render(){
+  _levelCache = new Map();
+  renderTabs();
+  const view = $("#view");
+  if(currentTab === "arbre") view.innerHTML = renderArbre();
+  else if(currentTab === "annuaire") view.innerHTML = renderAnnuaire();
+  else if(currentTab === "rejoindre") view.innerHTML = renderRejoindre();
+  else if(currentTab === "admin") view.innerHTML = renderAdmin();
+  attachViewListeners();
+}
+
+/* =========================================================================
+   ARBRE — diagramme SVG avec branches
+   ========================================================================= */
+const TREE_NODE_W = 178, TREE_NODE_H = 60, TREE_GAP_X = 18, TREE_LEVEL_H = 104,
+      TREE_PAD_X = 24, TREE_PAD_TOP = 20, TREE_FAMILY_GAP = 50, TREE_STEM = 20;
+
+function buildTreeWrapper(person, depth){
+  const realKids = childrenOf(person.id);
+  const collapsed = collapsedIds.has(person.id);
+  return {
+    person, depth,
+    hasRealChildren: realKids.length > 0,
+    realChildCount: realKids.length,
+    collapsed,
+    children: collapsed ? [] : realKids.map(k => buildTreeWrapper(k, depth+1)),
+  };
+}
+function measureTreeWidth(node){
+  if(node.children.length === 0){ node._w = TREE_NODE_W + TREE_GAP_X; return node._w; }
+  let w = 0;
+  node.children.forEach(c => { w += measureTreeWidth(c); });
+  node._w = Math.max(w, TREE_NODE_W + TREE_GAP_X);
+  return node._w;
+}
+function assignTreeX(node, xStart){
+  node.y = TREE_PAD_TOP + node.depth * TREE_LEVEL_H;
+  if(node.children.length === 0){
+    node.x = xStart + node._w/2;
+    return;
+  }
+  const sumChildW = node.children.reduce((a,c)=>a+c._w,0);
+  let cursor = xStart + (node._w - sumChildW)/2;
+  node.children.forEach(c => { assignTreeX(c, cursor); cursor += c._w; });
+  node.x = (node.children[0].x + node.children[node.children.length-1].x)/2;
+}
+function flattenTree(node, arr){
+  arr.push(node);
+  node.children.forEach(c => flattenTree(c, arr));
+}
+function computeForestLayout(){
+  const rts = roots();
+  let cursorX = TREE_PAD_X;
+  const allNodes = [];
+  let maxDepth = 0;
+  rts.forEach(person => {
+    const w = buildTreeWrapper(person, 0);
+    measureTreeWidth(w);
+    assignTreeX(w, cursorX);
+    cursorX += w._w + TREE_FAMILY_GAP;
+    flattenTree(w, allNodes);
+  });
+  allNodes.forEach(n => { if(n.depth > maxDepth) maxDepth = n.depth; });
+  const totalWidth = Math.max(cursorX - TREE_FAMILY_GAP + TREE_PAD_X, 320);
+  const totalHeight = TREE_PAD_TOP + (maxDepth+1) * TREE_LEVEL_H + 20;
+  return { allNodes, totalWidth, totalHeight };
+}
+function renderTreeCard(n, matchIds){
+  const p = n.person;
+  const isPh = p.status === "placeholder";
+  const x = n.x - TREE_NODE_W/2, y = n.y;
+  const info = effectiveLevelInfo(p);
+  let cls = "tree-card";
+  if(isPh) cls += " tree-card-placeholder";
+  if(matchIds){
+    if(matchIds.has(p.id)) cls += " tree-card-match";
+    else cls += " tree-card-dim";
+  }
+  return `<foreignObject x="${x}" y="${y}" width="${TREE_NODE_W}" height="${TREE_NODE_H}">
+    <div xmlns="http://www.w3.org/1999/xhtml" class="${cls}">
+      <div class="tree-card-main" data-open-profile="${p.id}" title="${esc(fullName(p))} — ${esc(info.label)}">
+        <span class="badge ${info.badgeClass}">${esc(info.label)}</span>
+        <span class="tree-card-name ${isPh?'placeholder-name':''}">${esc(fullName(p))}</span>
+      </div>
+      ${n.hasRealChildren ? `<button type="button" class="tree-toggle" data-toggle-collapse="${p.id}">${n.collapsed?'▸ déplier':'▾'} ${n.realChildCount} filleul${n.realChildCount>1?'s':''}</button>` : ""}
+    </div>
+  </foreignObject>`;
+}
+function renderTreeLinks(n, matchIds){
+  if(n.children.length === 0) return "";
+  const px = n.x, py = n.y + TREE_NODE_H;
+  const branchY = py + TREE_STEM;
+  const xs = n.children.map(c=>c.x);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const dimAll = matchIds && !matchIds.has(n.person.id);
+  const cls = dimAll ? "tree-link dim" : "tree-link";
+  let out = `<path class="${cls}" d="M${px},${py} L${px},${branchY}" />`;
+  if(n.children.length > 1){
+    out += `<path class="${cls}" d="M${minX},${branchY} L${maxX},${branchY}" />`;
+  }
+  n.children.forEach(c=>{
+    const cCls = (matchIds && !matchIds.has(c.person.id) && !matchIds.has(n.person.id)) ? "tree-link dim" : "tree-link";
+    out += `<path class="${cCls}" d="M${c.x},${branchY} L${c.x},${c.y}" />`;
+  });
+  return out;
+}
+
+// remonte tous les ancêtres d'une personne pour "ne pas casser" une recherche
+function ancestorsOf(id, acc){
+  acc = acc || new Set();
+  const p = findPerson(id);
+  if(!p || !p.parrainId) return acc;
+  if(acc.has(p.parrainId)) return acc; // sécurité
+  acc.add(p.parrainId);
+  return ancestorsOf(p.parrainId, acc);
+}
+
+function renderArbre(){
+  const legendLabels = ["1A","2A","3A","4A","5A","Diplômé","6A","7A+"];
+  const legend = `
+    <div class="tree-legend">
+      ${legendLabels.map(l=>{
+        const cls = l==="6A" || l==="7A+" ? "bAlumni" : levelBadgeClass(l);
+        return `<span><span class="badge ${cls}">${l}</span></span>`;
+      }).join("")}
+      <span>Contour pointillé = filleul non inscrit</span>
+      <span>▾ N = clique pour replier une branche</span>
+    </div>`;
+  if(roots().length === 0){
+    return `<div class="panel">
+      <p class="intro">Chaque branche part d'un membre fondateur (sans parrain) et descend vers ses filleuls, promo après promo.</p>
+      ${legend}
+      <div class="empty">Aucune famille pour l'instant. Sois le premier à <a href="#" data-goto="rejoindre">rejoindre l'arbre</a>.</div>
+    </div>`;
+  }
+  const { allNodes, totalWidth, totalHeight } = computeForestLayout();
+
+  const q = treeSearch.trim().toLowerCase();
+  let matchIds = null;
+  let matchCount = 0;
+  if(q){
+    matchIds = new Set();
+    allNodes.forEach(n => {
+      const p = n.person;
+      const info = effectiveLevelInfo(p);
+      const hay = (fullName(p) + " " + info.label + " " + p.level).toLowerCase();
+      if(hay.includes(q)){
+        matchIds.add(p.id);
+        matchCount++;
+        // remonte aussi tous ses parrains pour garder le chemin visible
+        ancestorsOf(p.id, matchIds);
+      }
+    });
+  }
+
+  const linksHtml = allNodes.filter(n => n.children.length>0).map(n => renderTreeLinks(n, matchIds)).join("");
+  const cardsHtml = allNodes.map(n => renderTreeCard(n, matchIds)).join("");
+
+  const zw = Math.round(totalWidth * treeZoom);
+  const zh = Math.round(totalHeight * treeZoom);
+
+  const controls = `<div class="tree-controls">
+    <input type="text" id="tree-search" placeholder="Rechercher un nom, une promo (ex : 7A)…" value="${esc(treeSearch)}">
+    <button type="button" class="btn secondary small" id="tree-expand-all">Tout déplier</button>
+    <button type="button" class="btn secondary small" id="tree-collapse-all">Tout replier</button>
+    <div class="tree-zoom">
+      <button type="button" class="btn secondary small" id="tree-zoom-out" title="Dézoomer">−</button>
+      <span class="tree-zoom-value">${Math.round(treeZoom*100)}%</span>
+      <button type="button" class="btn secondary small" id="tree-zoom-in" title="Zoomer">+</button>
+      <button type="button" class="btn secondary small" id="tree-zoom-reset" title="Réinitialiser">Reset</button>
+    </div>
+    <span class="tree-info">${allNodes.length} membre${allNodes.length>1?'s':''}${q?` · ${matchCount} correspondance${matchCount>1?'s':''}`:''}</span>
+  </div>`;
+
+  return `<div class="panel">
+    <p class="intro">Chaque branche part d'un membre fondateur (sans parrain) et descend vers ses filleuls, promo après promo. Quand un Diplômé a des filleuls, sa promo « visible » monte à 6A, 7A, etc. Clique sur une carte pour voir le profil, sur ▾ pour replier une branche, ou utilise la recherche pour retrouver quelqu'un.</p>
+    ${controls}
+    ${legend}
+    <div class="tree-svg-wrap" id="tree-svg-wrap">
+      <svg width="${zw}" height="${zh}" viewBox="0 0 ${totalWidth} ${totalHeight}" preserveAspectRatio="xMinYMin meet">
+        <g>${linksHtml}</g>
+        <g>${cardsHtml}</g>
+      </svg>
+    </div>
+  </div>`;
+}
+
+
+function findOrCreatePlaceholder(prenom, nom, level = "1A"){
+  const p1 = prenom.trim().toLowerCase();
+  const n1 = nom.trim().toLowerCase();
+
+  // Si un placeholder existe déjà, on le réutilise
+  let existing = people.find(p =>
+    p.status === "placeholder" &&
+    p.prenom.trim().toLowerCase() === p1 &&
+    p.nom.trim().toLowerCase() === n1
+  );
+
+  if(existing) return existing;
+
+  const placeholder = {
+    id: uid(),
+    prenom: prenom.trim(),
+    nom: nom.trim(),
+    level,
+    anneeDiplome: "",
+    parrainId: null,
+    bde: { membre:false, nom:"" },
+    experiences: [],
+    status: "placeholder",
+    submittedAt: new Date().toISOString()
+  };
+
+  people.push(placeholder);
+  return placeholder;
+}
+
+/* =========================================================================
+   ANNUAIRE
+   ========================================================================= */
+function renderAnnuaire(){
+  const list = approvedPeople()
+    .filter(p => {
+      if(!dirLevel) return true;
+      const info = effectiveLevelInfo(p);
+      return info.label === dirLevel || p.level === dirLevel;
+    })
+    .filter(p => !dirFiliere || p.filiere === dirFiliere)
+    .filter(p => {
+      if(!dirQuery) return true;
+      const q = dirQuery.toLowerCase();
+      const info = effectiveLevelInfo(p);
+      const hay = [p.prenom, p.nom, info.label, p.filiere || "", p.bde?.nom || "", ...(p.experiences||[]).filter(e=>e.visible).map(e=>e.entreprise+" "+e.poste)].join(" ").toLowerCase();
+      return hay.includes(q);
+    })
+    .sort((a,b)=> fullName(a).localeCompare(fullName(b)));
+
+  return `<div class="panel">
+    <p class="intro">Recherche un ancien par nom, promo, BDE ou entreprise (les infos pro affichées ici sont uniquement celles que la personne a choisi de rendre visibles).</p>
+    <div class="dir-controls">
+      <input type="text" id="dir-search" placeholder="Nom, entreprise, BDE, filière…" value="${esc(dirQuery)}">
+      <select id="dir-level">
+        <option value="">Toutes promos</option>
+        ${LEVELS.map(l=>`<option value="${l}" ${dirLevel===l?'selected':''}>${l}</option>`).join("")}
+      </select>
+      <select id="dir-filiere">
+        <option value="">Toutes filières</option>
+        ${FILIERES.map(fi=>`<option value="${fi}" ${dirFiliere===fi?'selected':''}>${fi}</option>`).join("")}
+      </select>
+    </div>
+    ${list.length===0 ? `<div class="empty">Aucun résultat.</div>` :
+      list.map(p => {
+        const info = effectiveLevelInfo(p);
+        const visExp = (p.experiences||[]).filter(e=>e.visible);
+        const subParts = [];
+        if(p.filiere) subParts.push(esc(p.filiere));
+        if(visExp.length) subParts.push(esc(visExp[0].poste + " · " + visExp[0].entreprise));
+        else if(p.bde?.membre) subParts.push("BDE " + esc(p.bde.nom));
+        const sub = subParts.join(" · ");
+        return `<div class="dir-row" data-open-profile="${p.id}">
+          <div class="dir-left">
+            <span class="badge ${info.badgeClass}">${esc(info.label)}</span>
+            <div>
+              <div class="dir-name">${esc(fullName(p))}</div>
+              ${sub ? `<div class="dir-sub">${sub}</div>` : ""}
+            </div>
+          </div>
+        </div>`;
+      }).join("")
+    }
+  </div>`;
+}
+
+/* =========================================================================
+   REJOINDRE (formulaire d'inscription)
+   ========================================================================= */
+function blankJoinForm(){
+  return {
+    prenom:"", nom:"", level:"1A", anneeDiplome:"", filiere:"",
+    parrainMode: "choisi", // 'choisi' | 'futur' | 'aucun'
+    parrainId: "",
+    parrainSearch: "",
+    parrainNonInscrit: {
+      prenom: "",
+      nom: "",
+      level: "1A"
+    },
+    bdeMembre:false, bdeNom:"",
+    experiences: [],
+    filleulsConnus: [], // [{prenom,nom,level}]
+    claimId: null,        // id d'un filleul déjà déclaré que cette personne réclame comme étant elle
+    claimDismissed: false, // l'utilisateur a dit "ce n'est pas moi" pour les suggestions actuelles
+    errors: {},
+  };
+}
+function renderRejoindre(){
+  if(!joinForm) joinForm = blankJoinForm();
+  const f = joinForm;
+  const approved = approvedPeople();
+  const matches = f.parrainSearch.trim().length>0
+    ? approved.filter(p => fullName(p).toLowerCase().includes(f.parrainSearch.trim().toLowerCase())).slice(0,8)
+    : [];
+  const chosen = f.parrainId ? findPerson(f.parrainId) : null;
+  const claimed = f.claimId ? findPerson(f.claimId) : null;
+  const phMatches = (!f.claimId && !f.claimDismissed) ? placeholderMatches(f.prenom, f.nom) : [];
+  const realMatches = !claimed ? existingRealMatches(f.prenom, f.nom, null) : [];
+
+  const errorCount = Object.keys(f.errors||{}).length;
+  return `<div class="panel">
+    <p class="intro">Renseigne tes infos pour te placer dans l'arbre. Ta fiche sera <strong>vérifiée par l'admin de l'école</strong> avant d'apparaître, pour garder l'arbre fiable.</p>
+    ${errorCount ? `<div class="warning-box" id="form-error-banner">⚠ ${errorCount === 1 ? "Un champ" : "Certains champs"} doit être corrigé avant l'envoi — regarde les messages en rouge ci-dessous.</div>` : ""}
+
+    <form id="join-form" novalidate>
+      <div class="form-section">
+        <h3>Identité</h3>
+        <div class="row2">
+          <div class="field">
+            <label>Prénom *</label>
+            <input type="text" name="prenom" value="${esc(f.prenom)}">
+            ${f.errors.prenom?`<div class="error-text">${f.errors.prenom}</div>`:""}
+          </div>
+          <div class="field">
+            <label>Nom *</label>
+            <input type="text" name="nom" value="${esc(f.nom)}">
+            ${f.errors.nom?`<div class="error-text">${f.errors.nom}</div>`:""}
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Promo actuelle *</label>
+            <select name="level">${LEVELS.map(l=>`<option value="${l}" ${f.level===l?'selected':''}>${l}</option>`).join("")}</select>
+          </div>
+          <div class="field">
+            <label>Année de diplôme (obtenue ou prévue) *</label>
+            <input type="number" name="anneeDiplome" min="1980" max="2035" value="${esc(f.anneeDiplome)}" placeholder="ex : 2027">
+            ${f.errors.anneeDiplome?`<div class="error-text">${f.errors.anneeDiplome}</div>`:""}
+          </div>
+        </div>
+        <div class="field">
+          <label>Filière</label>
+          <select name="filiere">
+            <option value="" ${!f.filiere?'selected':''}>— Pas encore choisie —</option>
+            ${FILIERES.map(fi=>`<option value="${fi}" ${f.filiere===fi?'selected':''}>${fi}</option>`).join("")}
+          </select>
+          <div class="hint" style="margin-top:5px;">La filière se choisit généralement en 3A. Tu pourras la mettre à jour plus tard.</div>
+        </div>
+      </div>
+
+      ${claimed ? `
+        <div class="success-box">
+          Tu réclames la fiche déclarée par <strong>${esc(fullName(findPerson(claimed.parrainId) || {prenom:'?',nom:''}))}</strong> (${esc(claimed.level)} déclaré). Le lien parrain → filleul est conservé automatiquement.
+          <div style="margin-top:8px;"><button type="button" class="btn secondary small" id="unclaim">Ce n'est pas moi / annuler</button></div>
+        </div>
+      ` : phMatches.length>0 ? `
+        <div class="warning-box">
+          <div style="margin-bottom:8px;">On dirait que quelqu'un t'a déjà déclaré comme filleul. Est-ce toi ?</div>
+          ${phMatches.map(m => {
+            const par = m.parrainId ? findPerson(m.parrainId) : null;
+            return `<div class="search-picker-item" style="background:var(--white);border:1px solid var(--line);border-radius:3px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;" data-claim-placeholder="${m.id}">
+              <span>${esc(fullName(m))} — ${esc(m.level)} ${par? '· déclaré par '+esc(fullName(par)) : ''}</span>
+              <span class="btn small" style="pointer-events:none;">C'est moi</span>
+            </div>`;
+          }).join("")}
+          <button type="button" class="btn secondary small" id="dismiss-claim">Aucun de ceux-là, c'est moi qui crée ma fiche</button>
+        </div>
+      ` : realMatches.length>0 ? `
+        <div class="warning-box">
+          Une fiche à ce nom existe déjà (${realMatches[0].status === 'approved' ? 'validée' : 'en attente de validation'}). Si c'est toi, inutile d'en recréer une — préviens l'admin pour éviter un doublon.
+        </div>
+      ` : ""}
+
+      <div class="form-section">
+        <h3>Parrainage</h3>
+
+        ${claimed ? `<p class="hint">
+          Le parrain est déjà connu grâce à la fiche que tu réclames ci-dessus.
+        </p>` : `
+
+          <p class="hint">
+            Qui t'a parrainé à l'ISFA ? Ça permet de te placer au bon endroit dans l'arbre.
+          </p>
+
+          <label class="checkline" style="margin-bottom:10px;">
+            <input type="checkbox" id="no-parrain" ${f.parrainMode==='aucun'?'checked':''}>
+            Je n'ai pas de parrain (membre fondateur / arrivé autrement)
+          </label>
+
+          ${f.parrainMode==='aucun' ? "" : `
+
+            ${chosen ? `
+              <div class="parrain-chosen">
+                <span>${esc(fullName(chosen))} — ${esc(chosen.level)}</span>
+                <button type="button" class="btn secondary small" id="clear-parrain">
+                  Changer
+                </button>
+              </div>
+
+            ` : f.parrainMode==='futur' ? `
+
+              <div class="row2">
+                <div class="field">
+                  <label>Prénom du futur parrain</label>
+                  <input
+                    type="text"
+                    id="futur-parrain-prenom"
+                    value="${esc(f.parrainNonInscrit.prenom)}"
+                    placeholder="Prénom">
+                </div>
+
+                <div class="field">
+                  <label>Nom du futur parrain</label>
+                  <input
+                    type="text"
+                    id="futur-parrain-nom"
+                    value="${esc(f.parrainNonInscrit.nom)}"
+                    placeholder="Nom">
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Niveau du futur parrain</label>
+                <select id="futur-parrain-level">
+                  ${LEVELS.map(l =>
+                    `<option value="${l}" ${f.parrainNonInscrit.level===l?'selected':''}>${l}</option>`
+                  ).join("")}
+                </select>
+              </div>
+
+              <p class="hint">
+                Cette personne n'est pas encore inscrite. Une place lui sera réservée.
+                Lorsqu'elle s'inscrira, elle pourra récupérer automatiquement cette place.
+              </p>
+
+              <button
+                type="button"
+                class="btn secondary small"
+                id="cancel-futur-parrain">
+                Finalement, mon parrain est inscrit
+              </button>
+
+            ` : `
+
+              <input
+                type="text"
+                id="parrain-search"
+                placeholder="Rechercher ton parrain par nom…"
+                value="${esc(f.parrainSearch)}">
+
+              ${matches.length>0 ? `<div class="search-picker">
+                ${matches.map(m =>
+                  `<div class="search-picker-item" data-pick-parrain="${m.id}">
+                    ${esc(fullName(m))} — ${esc(m.level)}
+                  </div>`
+                ).join("")}
+              </div>` :
+              (f.parrainSearch.trim() ?
+                `<div class="hint">Aucun résultat.</div>` : "")}
+
+              <button
+                type="button"
+                class="btn secondary small"
+                id="future-parrain">
+                Mon parrain n'est pas encore inscrit
+              </button>
+
+              ${f.errors.parrainId ?
+                `<div class="error-text">${f.errors.parrainId}</div>` : ""}
+            `}
+          `}
+        `}
+      </div>
+
+      <div class="form-section">
+        <h3>BDE</h3>
+        <label class="checkline" style="margin-bottom:10px;">
+          <input type="checkbox" id="bde-membre" ${f.bdeMembre?'checked':''}>
+          J'ai fait partie d'un BDE
+        </label>
+        ${f.bdeMembre ? `<div class="field"><label>Nom du BDE</label><input type="text" id="bde-nom" value="${esc(f.bdeNom)}" placeholder="ex : BDE ISFA 2024"></div>` : ""}
+      </div>
+
+      <div class="form-section">
+        <h3>Expériences professionnelles</h3>
+        <p class="hint">Stages, alternances, poste actuel… Coche « visible » uniquement pour ce que tu veux montrer dans l'annuaire — sinon, ça reste privé (non affiché à qui que ce soit hors admin).</p>
+        <div id="exp-list">
+          ${f.experiences.map((e,i)=>renderExpEditRow(e,i)).join("")}
+        </div>
+        <button type="button" class="btn secondary small" id="add-exp">+ Ajouter une expérience</button>
+      </div>
+
+      <div class="form-section">
+        <h3>Filleuls que tu as parrainés (optionnel)</h3>
+        <p class="hint">S'ils n'ont pas encore rejoint l'arbre, ajoute-les ici : ils apparaîtront en pointillé, en attente qu'ils créent eux-mêmes leur fiche.</p>
+        <div id="filleul-list">
+          ${f.filleulsConnus.map((x,i)=>`
+            <div class="filleul-row">
+              <input type="text" placeholder="Prénom" data-fl="prenom" data-i="${i}" value="${esc(x.prenom)}">
+              <input type="text" placeholder="Nom" data-fl="nom" data-i="${i}" value="${esc(x.nom)}">
+              <select data-fl="level" data-i="${i}">${LEVELS.map(l=>`<option value="${l}" ${x.level===l?'selected':''}>${l}</option>`).join("")}</select>
+              <button type="button" class="btn secondary small" data-remove-fl="${i}">✕</button>
+            </div>
+          `).join("")}
+        </div>
+        <button type="button" class="btn secondary small" id="add-fl">+ Ajouter un filleul</button>
+      </div>
+
+      <button type="submit" class="btn">Envoyer ma fiche</button>
+    </form>
+  </div>`;
+}
+function renderExpEditRow(e,i){
+  return `<div class="exp-card" data-exp-idx="${i}">
+    <div class="exp-card-top">
+      <div class="row2" style="flex:1;">
+        <div class="field" style="margin-bottom:8px;">
+          <label>Poste</label>
+          <input type="text" data-exp="poste" data-i="${i}" value="${esc(e.poste)}" placeholder="ex : Data Analyst">
+        </div>
+        <div class="field" style="margin-bottom:8px;">
+          <label>Entreprise</label>
+          <input type="text" data-exp="entreprise" data-i="${i}" value="${esc(e.entreprise)}">
+        </div>
+      </div>
+      <button type="button" class="btn secondary small" data-remove-exp="${i}">✕</button>
+    </div>
+    <div class="row2">
+      <div class="field" style="margin-bottom:0;">
+        <label>Type</label>
+        <select data-exp="type" data-i="${i}">${EXP_TYPES.map(t=>`<option ${e.type===t?'selected':''}>${t}</option>`).join("")}</select>
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>Période</label>
+        <input type="text" data-exp="periode" data-i="${i}" value="${esc(e.periode)}" placeholder="ex : 2023 – 2024">
+      </div>
+    </div>
+    <label class="checkline" style="margin-top:10px;">
+      <input type="checkbox" data-exp="visible" data-i="${i}" ${e.visible?'checked':''}>
+      Visible dans l'annuaire
+    </label>
+  </div>`;
+}
+
+/* =========================================================================
+   ADMIN
+   ========================================================================= */
+function renderAdmin(){
+  if(!isAdmin){
+    return `<div class="panel admin-gate">
+      <h3 style="margin-bottom:10px;">Accès admin</h3>
+      <p class="hint" style="margin-bottom:14px;">Réservé à la personne qui gère l'arbre.</p>
+      <input type="password" id="admin-pass" placeholder="Mot de passe" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:3px;margin-bottom:10px;">
+      <button class="btn" id="admin-login" style="width:100%;justify-content:center;">Se connecter</button>
+      <div id="admin-error" class="error-text" style="text-align:center;margin-top:8px;"></div>
+    </div>`;
+  }
+  const pend = pendingPeople();
+  const ph = placeholderPeople();
+  const app = approvedPeople();
+  const stats = LEVELS.map(l => ({l, n: app.filter(p=>p.level===l).length}));
+
+  return `<div class="panel">
+    <div class="warning-box" style="margin-bottom:14px;">
+      ⓘ L'authentification est <strong>locale au navigateur</strong> : n'importe qui avec un accès aux outils développeur peut potentiellement contourner cette page. Ne laisse pas la session ouverte sur un poste public et change régulièrement le mot de passe.
+    </div>
+    <div class="section-title">
+      <h3>Vue d'ensemble</h3>
+      <button class="btn secondary small" id="admin-logout">Se déconnecter</button>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num">${app.length}</div><div class="lbl">Membres validés</div></div>
+      <div class="stat-card"><div class="num">${pend.length}</div><div class="lbl">En attente</div></div>
+      <div class="stat-card"><div class="num">${ph.length}</div><div class="lbl">Filleuls non réclamés</div></div>
+      ${stats.map(s=>`<div class="stat-card"><div class="num">${s.n}</div><div class="lbl">${s.l}</div></div>`).join("")}
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-bottom:14px;">Demandes en attente (${pend.length})</h3>
+    ${pend.length===0 ? `<div class="empty">Aucune demande en attente.</div>` : pend.map(p=>renderAdminPendingItem(p)).join("")}
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-bottom:14px;">Filleuls non réclamés (${ph.length})</h3>
+    ${ph.length===0 ? `<div class="empty">Aucun.</div>` : ph.map(p=>`
+      <div class="admin-item">
+        <div class="admin-item-top">
+          <div><strong>${esc(fullName(p))}</strong> — ${esc(p.level)} <span class="node-meta">déclaré par ${esc(fullName(findPerson(p.parrainId)||{prenom:'?',nom:''}))}</span></div>
+          <div class="admin-actions">
+            <button class="btn danger small" data-delete-person="${p.id}">Supprimer</button>
+          </div>
+        </div>
+      </div>
+    `).join("")}
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-bottom:14px;">Membres validés (${app.length})</h3>
+    ${app.length===0 ? `<div class="empty">Aucun.</div>` : app.sort((a,b)=>fullName(a).localeCompare(fullName(b))).map(p=>{
+      const info = effectiveLevelInfo(p);
+      return `
+      <div class="admin-item">
+        <div class="admin-item-top">
+          <div><span class="badge ${info.badgeClass}">${esc(info.label)}</span> <strong>${esc(fullName(p))}</strong> <span class="node-meta">(stocké : ${esc(p.level)}${p.filiere?` · ${esc(p.filiere)}`:""})</span></div>
+          <div class="admin-actions">
+            <button class="btn secondary small" data-edit-person="${p.id}">Modifier</button>
+            <button class="btn danger small" data-delete-person="${p.id}">Supprimer</button>
+          </div>
+        </div>
+      </div>
+    `;}).join("")}
+  </div>
+
+  ${editingId ? renderAdminEditModal() : ""}
+  `;
+}
+function renderAdminPendingItem(p){
+  const parrain = p.parrainId ? findPerson(p.parrainId) : null;
+  const dup = nameTaken(p.prenom, p.nom, p.id);
+  return `<div class="admin-item">
+    <div class="admin-item-top">
+      <div>
+        <strong>${esc(fullName(p))}</strong> — ${esc(p.level)} · diplôme ${esc(p.anneeDiplome)}
+        ${dup ? `<span class="pill pending" style="margin-left:6px;">⚠ nom similaire déjà présent</span>` : ""}
+      </div>
+    </div>
+    <div class="node-meta" style="margin-top:6px;">
+      Parrain déclaré : ${parrain ? esc(fullName(parrain)) + " (" + esc(parrain.level) + ")" : "aucun (fondateur déclaré)"}
+      ${p.filiere ? " · filière " + esc(p.filiere) : " · filière non renseignée"}
+      ${p.bde?.membre ? " · BDE " + esc(p.bde.nom) : ""}
+    </div>
+    ${(p.experiences||[]).length ? `<div class="node-meta" style="margin-top:4px;">Expériences : ${p.experiences.map(e=>esc(e.poste+' @ '+e.entreprise)+(e.visible?'':' (privé)')).join(' · ')}</div>` : ""}
+    ${(p.filleulsConnus||[]).length ? `<div class="node-meta" style="margin-top:4px;">Filleuls déclarés : ${p.filleulsConnus.map(f=>esc(f.prenom+' '+f.nom+' ('+f.level+')')).join(', ')}</div>` : ""}
+    <div class="admin-actions">
+      <button class="btn small" data-approve="${p.id}">Valider</button>
+      <button class="btn danger small" data-reject="${p.id}">Rejeter</button>
+    </div>
+  </div>`;
+}
+
+function renderAdminEditModal(){
+  const p = findPerson(editingId);
+  if(!p) return "";
+  return `<div id="edit-modal-backdrop" style="position:fixed;inset:0;background:rgba(28,43,57,.55);z-index:60;">
+    <div class="modal-box" style="margin:40px auto;">
+      <button class="modal-close" id="close-edit">×</button>
+      <h3 style="margin-bottom:16px;">Modifier — ${esc(fullName(p))}</h3>
+      <div class="row2">
+        <div class="field"><label>Prénom</label><input type="text" id="edit-prenom" value="${esc(p.prenom)}"></div>
+        <div class="field"><label>Nom</label><input type="text" id="edit-nom" value="${esc(p.nom)}"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Promo</label><select id="edit-level">${LEVELS.map(l=>`<option ${p.level===l?'selected':''}>${l}</option>`).join("")}</select></div>
+        <div class="field"><label>Année diplôme</label><input type="number" id="edit-annee" value="${esc(p.anneeDiplome)}"></div>
+      </div>
+      <div class="field">
+        <label>Filière</label>
+        <select id="edit-filiere">
+          <option value="" ${!p.filiere?'selected':''}>— Aucune —</option>
+          ${FILIERES.map(fi=>`<option value="${fi}" ${p.filiere===fi?'selected':''}>${fi}</option>`).join("")}
+        </select>
+      </div>
+      <div class="field">
+        <label>Parrain (ID interne, laisser vide si aucun)</label>
+        <select id="edit-parrain">
+          <option value="">— Aucun —</option>
+          ${approvedPeople().filter(x=>x.id!==p.id).map(x=>`<option value="${x.id}" ${p.parrainId===x.id?'selected':''}>${esc(fullName(x))} (${x.level})</option>`).join("")}
+        </select>
+      </div>
+      <button class="btn" id="save-edit">Enregistrer</button>
+    </div>
+  </div>`;
+}
+
+/* =========================================================================
+   MODAL — profil
+   ========================================================================= */
+function openProfileModal(id){
+  const p = findPerson(id);
+  if(!p) return;
+  const root = $("#modal-root");
+  const parrain = p.parrainId ? findPerson(p.parrainId) : null;
+  const kids = childrenOf(p.id);
+  const isPh = p.status === "placeholder";
+  const exps = (p.experiences||[]).filter(e => isAdmin || e.visible);
+  const info = effectiveLevelInfo(p);
+  const parrainInfo = parrain ? effectiveLevelInfo(parrain) : null;
+
+  root.innerHTML = `
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-box">
+      <button class="modal-close" data-close-modal>×</button>
+      <div class="modal-title">
+        <h3>${esc(fullName(p))}</h3>
+        <span class="badge ${info.badgeClass}">${esc(info.label)}</span>
+      </div>
+      <div class="modal-sub">${isPh ? "Filleul déclaré — n'a pas encore créé sa fiche" : "Diplôme " + esc(p.anneeDiplome)}${p.filiere ? ` · ${esc(p.filiere)}` : ""}${info.label !== p.level ? ` · promo stockée : ${esc(p.level)}` : ""}</div>
+
+      <div class="modal-block">
+        <h4>Famille</h4>
+        <div class="node-meta">Parrain : ${parrain ? `${esc(fullName(parrain))} (${esc(parrainInfo.label)})` : "— (fondateur)"}</div>
+        <div class="node-meta">Filleuls : ${kids.length ? kids.map(k=>{
+          const ki = effectiveLevelInfo(k);
+          return esc(fullName(k))+" ("+esc(ki.label)+")";
+        }).join(", ") : "aucun pour le moment"}</div>
+      </div>
+
+      ${p.bde?.membre ? `<div class="modal-block"><h4>BDE</h4><div class="node-meta">${esc(p.bde.nom)}</div></div>` : ""}
+
+      <div class="modal-block">
+        <h4>Parcours professionnel</h4>
+        ${exps.length ? exps.map(e=>`
+          <div class="exp-view">
+            <div class="role">${esc(e.poste)} — ${esc(e.entreprise)}</div>
+            <div class="meta">${esc(e.type)} · ${esc(e.periode)} ${(!e.visible && isAdmin) ? "· 🔒 privé (visible admin seulement)" : ""}</div>
+          </div>
+        `).join("") : `<div class="locked-note">Rien de partagé publiquement.</div>`}
+      </div>
+    </div>
+  `;
+  root.classList.add("open");
+}
+function closeModal(){
+  $("#modal-root").classList.remove("open");
+  $("#modal-root").innerHTML = "";
+}
+
+/* =========================================================================
+   VALIDATION
+   ========================================================================= */
+function validateJoinForm(f){
+  const errors = {};
+
+  if(!NAME_RE.test(f.prenom.trim()))
+    errors.prenom = "Prénom invalide (2-40 lettres).";
+
+  if(!NAME_RE.test(f.nom.trim()))
+    errors.nom = "Nom invalide (2-40 lettres).";
+
+  const yr = parseInt(f.anneeDiplome,10);
+
+  if(!yr || yr < 1980 || yr > 2035)
+    errors.anneeDiplome = "Année invalide.";
+
+  if(!f.claimId && f.parrainMode === "choisi" && !f.parrainId){
+    errors.parrainId =
+      "Choisis ton parrain dans la liste, indique un futur parrain, ou coche « je n'ai pas de parrain ».";
+  }
+
+  if(!f.claimId && f.parrainMode === "futur"){
+    if(!f.parrainNonInscrit.prenom.trim())
+      errors.parrainId = "Indique le prénom de ton futur parrain.";
+
+    if(!f.parrainNonInscrit.nom.trim())
+      errors.parrainId = "Indique le nom de ton futur parrain.";
+  }
+
+  return errors;
+}
+
+/* =========================================================================
+   EVENTS
+   ========================================================================= */
+function attachViewListeners(){
+  // profile open
+  $$("[data-open-profile]").forEach(el=>{
+    el.addEventListener("click", (e)=>{
+      e.preventDefault();
+      openProfileModal(el.dataset.openProfile);
+    });
+  });
+  $$("[data-goto]").forEach(el=>{
+    el.addEventListener("click", (e)=>{ e.preventDefault(); currentTab = el.dataset.goto; render(); });
+  });
+
+  if(currentTab === "arbre"){
+    $$("[data-toggle-collapse]").forEach(el=>{
+      el.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        const id = el.dataset.toggleCollapse;
+        if(collapsedIds.has(id)) collapsedIds.delete(id); else collapsedIds.add(id);
+        render();
+      });
+    });
+    $("#tree-search")?.addEventListener("input", e=>{
+      treeSearch = e.target.value; render();
+      const el = $("#tree-search");
+      if(el){ el.focus(); el.selectionStart = el.value.length; }
+    });
+    $("#tree-expand-all")?.addEventListener("click", ()=>{ collapsedIds.clear(); render(); });
+    $("#tree-collapse-all")?.addEventListener("click", ()=>{
+      collapsedIds = new Set(visiblePeople().filter(p=>childrenOf(p.id).length>0).map(p=>p.id));
+      render();
+    });
+    $("#tree-zoom-in")?.addEventListener("click", ()=>{ treeZoom = Math.min(2.5, Math.round((treeZoom+0.1)*10)/10); render(); });
+    $("#tree-zoom-out")?.addEventListener("click", ()=>{ treeZoom = Math.max(0.4, Math.round((treeZoom-0.1)*10)/10); render(); });
+    $("#tree-zoom-reset")?.addEventListener("click", ()=>{ treeZoom = 1; render(); });
+  }
+
+  if(currentTab === "annuaire"){
+    $("#dir-search")?.addEventListener("input", e=>{ dirQuery = e.target.value; render(); $("#dir-search").focus(); $("#dir-search").selectionStart = $("#dir-search").value.length; });
+    $("#dir-level")?.addEventListener("change", e=>{ dirLevel = e.target.value; render(); });
+    $("#dir-filiere")?.addEventListener("change", e=>{ dirFiliere = e.target.value; render(); });
+  }
+
+  if(currentTab === "rejoindre") attachJoinListeners();
+  if(currentTab === "admin") attachAdminListeners();
+}
+
+function attachJoinListeners(){
+  const f = joinForm;
+  const form = $("#join-form");
+  if(!form) return;
+
+  // détecte les correspondances (filleul déjà déclaré / doublon) quand on quitte prénom ou nom
+  const recheckNames = ()=>{ syncFormFields(); render(); };
+  $("[name=prenom]")?.addEventListener("blur", recheckNames);
+  $("[name=nom]")?.addEventListener("blur", recheckNames);
+  // si la personne retouche son nom après avoir refusé une suggestion, on relance la détection
+  $("[name=prenom]")?.addEventListener("input", ()=>{ f.claimDismissed = false; });
+  $("[name=nom]")?.addEventListener("input", ()=>{ f.claimDismissed = false; });
+
+  $$("[data-claim-placeholder]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      syncFormFields();
+      f.claimId = el.dataset.claimPlaceholder;
+      f.claimDismissed = false;
+      render();
+    });
+  });
+  $("#dismiss-claim")?.addEventListener("click", ()=>{
+    syncFormFields();
+    f.claimDismissed = true;
+    render();
+  });
+  $("#unclaim")?.addEventListener("click", ()=>{
+    syncFormFields();
+    f.claimId = null;
+    f.claimDismissed = true;
+    render();
+  });
+
+  form.addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    const now = Date.now();
+    if(now - lastSubmitAt < SUBMIT_MIN_INTERVAL_MS){
+      const wait = Math.ceil((SUBMIT_MIN_INTERVAL_MS - (now - lastSubmitAt))/1000);
+      $("#view").insertAdjacentHTML("afterbegin", `<div class="panel"><div class="warning-box">Merci de patienter ${wait}s avant d'envoyer une nouvelle fiche.</div></div>`);
+      return;
+    }
+    try{
+      syncFormFields();
+      const errors = validateJoinForm(f);
+      f.errors = errors;
+      if(Object.keys(errors).length){
+        render();
+        $("#form-error-banner")?.scrollIntoView({behavior:"smooth", block:"start"});
+        return;
+      }
+      lastSubmitAt = Date.now();
+      await submitJoinForm(f);
+    }catch(err){
+      console.error("Erreur à l'envoi du formulaire :", err);
+      $("#view").insertAdjacentHTML("afterbegin", `<div class="panel"><div class="warning-box">Une erreur inattendue a bloqué l'envoi (${esc(err.message || err)}). Réessaie, ou préviens l'admin si ça persiste.</div></div>`);
+    }
+  });
+
+  async function submitJoinForm(f){
+    let person;
+    const claimTarget = f.claimId ? findPerson(f.claimId) : null;
+
+    if(claimTarget && claimTarget.status === "placeholder"){
+      // Réclamer la fiche déclarée : on la transforme au lieu de créer un doublon,
+      // pour préserver son id et les liens vers ses éventuels propres filleuls.
+      claimTarget.prenom = f.prenom.trim();
+      claimTarget.nom = f.nom.trim();
+      claimTarget.level = f.level;
+      claimTarget.anneeDiplome = parseInt(f.anneeDiplome,10);
+      claimTarget.filiere = FILIERES.includes(f.filiere) ? f.filiere : "";
+      claimTarget.bde = { membre: f.bdeMembre, nom: f.bdeMembre ? f.bdeNom.trim() : "" };
+      claimTarget.experiences = f.experiences.map(x=>({...x}));
+      claimTarget.status = "pending";
+      claimTarget.submittedAt = new Date().toISOString();
+      person = claimTarget;
+    } else {
+
+      let parrainId = null;
+
+      if(f.parrainMode === "choisi"){
+        parrainId = f.parrainId || null;
+      }
+
+      if(f.parrainMode === "futur"){
+        const futurParrain = findOrCreatePlaceholder(
+          f.parrainNonInscrit.prenom,
+          f.parrainNonInscrit.nom,
+          f.parrainNonInscrit.level
+        );
+
+        parrainId = futurParrain.id;
+      }
+
+      if(f.parrainMode === "aucun"){
+        parrainId = null;
+      }
+
+      person = {
+        id: uid(),
+        prenom: f.prenom.trim(),
+        nom: f.nom.trim(),
+        level: f.level,
+        anneeDiplome: parseInt(f.anneeDiplome,10),
+        filiere: FILIERES.includes(f.filiere) ? f.filiere : "",
+        parrainId: parrainId,
+        bde: {
+          membre: f.bdeMembre,
+          nom: f.bdeMembre ? f.bdeNom.trim() : ""
+        },
+        experiences: f.experiences.map(x=>({...x})),
+        status: "pending",
+        submittedAt: new Date().toISOString(),
+      };
+
+      people.push(person);
+    }
+
+    // filleuls connus -> placeholders
+    (f.filleulsConnus || []).forEach(fl => {
+      if(!fl.prenom.trim() || !fl.nom.trim()) return;
+
+      const filleul = findOrCreatePlaceholder(
+        fl.prenom,
+        fl.nom,
+        fl.level
+      );
+
+      filleul.parrainId = person.id;
+    });
+
+    await savePeople();
+    joinForm = null;
+    currentTab = "rejoindre";
+    render();
+    $("#view").insertAdjacentHTML("afterbegin", `<div class="panel"><div class="success-box">Ta fiche a bien été envoyée. Elle apparaîtra dans l'arbre dès validation par l'admin.</div></div>`);
+  }
+
+  $("#no-parrain")?.addEventListener("change", e=>{
+    f.parrainMode = e.target.checked ? "aucun" : "choisi";
+    f.parrainId=""; f.parrainSearch="";
+    syncFormFields(); render();
+  });
+  $("#future-parrain")?.addEventListener("click", ()=>{
+    syncFormFields();
+    f.parrainMode = "futur";
+    f.parrainId = "";
+    f.parrainSearch = "";
+    render();
+  });
+  $("#cancel-futur-parrain")?.addEventListener("click", ()=>{
+    syncFormFields();
+    f.parrainMode = "choisi";
+    f.parrainNonInscrit = { prenom:"", nom:"", level:"1A" };
+    render();
+  });
+  $("#parrain-search")?.addEventListener("input", e=>{
+    f.parrainSearch = e.target.value; syncFormFields(); render();
+    setTimeout(()=>{ const el=$("#parrain-search"); if(el){ el.focus(); el.selectionStart = el.value.length; } },0);
+  });
+  $$("[data-pick-parrain]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      f.parrainId = el.dataset.pickParrain; f.parrainSearch=""; syncFormFields(); render();
+    });
+  });
+  $("#clear-parrain")?.addEventListener("click", ()=>{ f.parrainId=""; syncFormFields(); render(); });
+
+  $("#bde-membre")?.addEventListener("change", e=>{ f.bdeMembre = e.target.checked; syncFormFields(); render(); });
+
+  $("#add-exp")?.addEventListener("click", ()=>{
+    syncFormFields();
+    if(f.experiences.length >= MAX_EXPERIENCES){
+      alert("Maximum " + MAX_EXPERIENCES + " expériences par fiche.");
+      return;
+    }
+    f.experiences.push({poste:"",entreprise:"",type:"Stage",periode:"",visible:false});
+    render();
+  });
+  $$("[data-remove-exp]").forEach(el=>{
+    el.addEventListener("click", ()=>{ syncFormFields(); f.experiences.splice(parseInt(el.dataset.removeExp,10),1); render(); });
+  });
+
+  $("#add-fl")?.addEventListener("click", ()=>{
+    syncFormFields();
+    if(f.filleulsConnus.length >= MAX_FILLEULS_DECLARES){
+      alert("Maximum " + MAX_FILLEULS_DECLARES + " filleuls déclarés par fiche.");
+      return;
+    }
+    f.filleulsConnus.push({prenom:"",nom:"",level:"1A"});
+    render();
+  });
+  $$("[data-remove-fl]").forEach(el=>{
+    el.addEventListener("click", ()=>{ syncFormFields(); f.filleulsConnus.splice(parseInt(el.dataset.removeFl,10),1); render(); });
+  });
+}
+// pull live input values into joinForm before any re-render triggered by a non-input control
+function syncFormFields(){
+  const f = joinForm;
+  const g = sel => $(sel)?.value;
+  if($("[name=prenom]")) f.prenom = g("[name=prenom]");
+  if($("[name=nom]")) f.nom = g("[name=nom]");
+  if($("[name=level]")) f.level = g("[name=level]");
+  if($("[name=anneeDiplome]")) f.anneeDiplome = g("[name=anneeDiplome]");
+  if($("[name=filiere]")) f.filiere = g("[name=filiere]");
+  if($("#bde-nom")) f.bdeNom = g("#bde-nom");
+  if($("#futur-parrain-prenom"))
+    f.parrainNonInscrit.prenom = g("#futur-parrain-prenom");
+  if($("#futur-parrain-nom"))
+    f.parrainNonInscrit.nom = g("#futur-parrain-nom");
+  if($("#futur-parrain-level"))
+    f.parrainNonInscrit.level = g("#futur-parrain-level");
+  $$("[data-exp]").forEach(el=>{
+    const i = parseInt(el.dataset.i,10);
+    const field = el.dataset.exp;
+    if(!f.experiences[i]) return;
+    f.experiences[i][field] = field==="visible" ? el.checked : el.value;
+  });
+  $$("[data-fl]").forEach(el=>{
+    const i = parseInt(el.dataset.i,10);
+    const field = el.dataset.fl;
+    if(!f.filleulsConnus[i]) return;
+    f.filleulsConnus[i][field] = el.value;
+  });
+}
+
+function attachAdminListeners(){
+  $("#admin-login")?.addEventListener("click", async ()=>{
+    const errEl = $("#admin-error");
+    const now = Date.now();
+    if(loginLockedUntil > now){
+      const remain = Math.ceil((loginLockedUntil - now)/1000);
+      if(errEl) errEl.textContent = `Trop de tentatives. Réessaie dans ${remain}s.`;
+      return;
+    }
+    const val = $("#admin-pass").value || "";
+    let hash;
+    try { hash = await sha256(val); }
+    catch(err){ if(errEl) errEl.textContent = "Erreur crypto — navigateur non compatible."; return; }
+    if(hash === ADMIN_PASSWORD_HASH){
+      loginFailedAttempts = 0;
+      isAdmin = true;
+      render();
+      return;
+    }
+    loginFailedAttempts++;
+    const remaining = LOGIN_MAX_TRIES - loginFailedAttempts;
+    if(remaining <= 0){
+      loginLockedUntil = Date.now() + LOGIN_LOCKOUT_MS;
+      loginFailedAttempts = 0;
+      if(errEl) errEl.textContent = `Trop d'essais. Verrouillé ${Math.round(LOGIN_LOCKOUT_MS/60000)} min.`;
+    } else {
+      if(errEl) errEl.textContent = `Mot de passe incorrect. ${remaining} essai${remaining>1?'s':''} restant${remaining>1?'s':''}.`;
+    }
+  });
+  $("#admin-pass")?.addEventListener("keydown", e=>{ if(e.key==="Enter") $("#admin-login").click(); });
+  $("#admin-logout")?.addEventListener("click", ()=>{ isAdmin = false; render(); });
+
+  $$("[data-approve]").forEach(el=>{
+    el.addEventListener("click", async ()=>{
+      const p = findPerson(el.dataset.approve);
+      if(p) p.status = "approved";
+      await savePeople(); render();
+    });
+  });
+  $$("[data-reject]").forEach(el=>{
+    el.addEventListener("click", async ()=>{
+      if(!confirm("Rejeter cette demande ? La fiche sera définitivement supprimée.")) return;
+      people = people.filter(p=>p.id !== el.dataset.reject);
+      await savePeople(); render();
+    });
+  });
+  $$("[data-delete-person]").forEach(el=>{
+    el.addEventListener("click", async ()=>{
+      if(!confirm("Supprimer cette fiche ? Ses filleuls deviendront racines de leur propre branche.")) return;
+      const id = el.dataset.deletePerson;
+      people = people.filter(p=>p.id !== id);
+      people.forEach(p=>{ if(p.parrainId===id) p.parrainId=null; });
+      await savePeople(); render();
+    });
+  });
+  $$("[data-edit-person]").forEach(el=>{
+    el.addEventListener("click", ()=>{ editingId = el.dataset.editPerson; render(); });
+  });
+  $("#close-edit")?.addEventListener("click", ()=>{ editingId=null; render(); });
+  $("#edit-modal-backdrop")?.addEventListener("click", (e)=>{ if(e.target.id==="edit-modal-backdrop"){ editingId=null; render(); } });
+  $("#save-edit")?.addEventListener("click", async ()=>{
+    const p = findPerson(editingId);
+    if(!p) return;
+    p.prenom = $("#edit-prenom").value.trim();
+    p.nom = $("#edit-nom").value.trim();
+    p.level = $("#edit-level").value;
+    p.anneeDiplome = $("#edit-annee").value;
+    const editedFiliere = $("#edit-filiere")?.value || "";
+    p.filiere = FILIERES.includes(editedFiliere) ? editedFiliere : "";
+    p.parrainId = $("#edit-parrain").value || null;
+    editingId = null;
+    await savePeople(); render();
+  });
+}
+
+// tabs + modal close (delegated once)
+document.addEventListener("click", (e)=>{
+  const tabBtn = e.target.closest("[data-tab]");
+  if(tabBtn){ currentTab = tabBtn.dataset.tab; if(currentTab==='rejoindre' && !joinForm) joinForm = blankJoinForm(); render(); return; }
+  if(e.target.closest("[data-close-modal]")) closeModal();
+});
+
+/* =========================================================================
+   INIT
+   ========================================================================= */
+(async function init(){
+  $("#view").innerHTML = `<div class="empty">Chargement de l'arbre…</div>`;
+  await loadPeople();
+  render();
+})();
+
+})(); // fin de l'IIFE globale — protège l'état de la console
+</script>
+</body>
+</html>
