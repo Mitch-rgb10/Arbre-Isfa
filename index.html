@@ -600,7 +600,7 @@ function ancestorsOf(id, acc){
 }
 
 function renderArbre(){
-  const legendLabels = ["1A","2A","3A","4A","5A","Diplômé","6A","7A+"];
+  const legendLabels = ["1A","2A","3A","4A","5A","6A","7A","8A","9A","10A+"];
   const legend = `
     <div class="tree-legend">
       ${legendLabels.map(l=>{
@@ -608,7 +608,6 @@ function renderArbre(){
         return `<span><span class="badge ${cls}">${l}</span></span>`;
       }).join("")}
       <span>Contour pointillé = filleul non inscrit</span>
-      <span>▾ N = clique pour replier une branche</span>
     </div>`;
   if(roots().length === 0){
     return `<div class="panel">
