@@ -282,17 +282,7 @@
 (function(){
 'use strict';
 
-/* =========================================================================
-   CONFIG
-   Le mot de passe admin est stocké en SHA-256 (pas en clair).
-   Pour le changer :
-     1) choisis un nouveau mot de passe
-     2) calcule son SHA-256, par ex. en collant dans une console :
-        [...new Uint8Array(await crypto.subtle.digest('SHA-256',
-          new TextEncoder().encode('ton-nouveau-mdp')))]
-          .map(b=>b.toString(16).padStart(2,'0')).join('')
-     3) remplace ADMIN_PASSWORD_HASH ci-dessous
-   ========================================================================= */
+
 const ADMIN_PASSWORD_HASH = "26168ca5e7220b91e8f4be6474bfbd7c70c5f44dc3b0af484fb2fcdf2b15ef9d";
 const LOGIN_MAX_TRIES = 5;
 const LOGIN_LOCKOUT_MS = 5 * 60 * 1000;
