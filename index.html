@@ -133,6 +133,9 @@
   }
   .tree-link{stroke:var(--line);stroke-width:1.5;fill:none;}
   .tree-link.dim{stroke:#E8E3D3;}
+  .tree-link-extra{stroke:var(--amber);stroke-width:1.5;fill:none;stroke-dasharray:5 3;opacity:.8;}
+  .tree-link-extra.dim{stroke:#EAD9B8;opacity:.35;}
+  .tree-row-divider{stroke:var(--line);stroke-width:1;stroke-dasharray:2 5;}
   .tree-card{
     width:100%;height:100%;box-sizing:border-box;
     display:flex;flex-direction:column;justify-content:center;gap:4px;
@@ -282,6 +285,24 @@
 (function(){
 'use strict';
 
+// --- Frein anti-copie (PAS une vraie protection) --------------------------
+// Ceci désactive le clic droit et quelques raccourcis clavier courants pour
+// décourager le survol occasionnel. Ça n'empêche PAS réellement de voir le
+// code source : n'importe qui peut toujours taper "view-source:" devant
+// l'URL, ouvrir les outils développeur depuis le menu du navigateur, ou
+// récupérer le fichier directement depuis le réseau. Ne pas compter dessus
+// pour protéger des données sensibles (le mot de passe admin, lui, est déjà
+// haché — voir ADMIN_PASSWORD_HASH plus bas — mais tout le reste du code
+// JS reste lisible par quiconque le veut vraiment).
+document.addEventListener("contextmenu", e => e.preventDefault());
+document.addEventListener("keydown", e => {
+  const k = e.key;
+  const blocked =
+    k === "F12" ||
+    ((e.ctrlKey || e.metaKey) && e.shiftKey && ["I","J","C"].includes(k.toUpperCase())) ||
+    ((e.ctrlKey || e.metaKey) && k.toUpperCase() === "U");
+  if(blocked) e.preventDefault();
+});
 
 const ADMIN_PASSWORD_HASH = "26168ca5e7220b91e8f4be6474bfbd7c70c5f44dc3b0af484fb2fcdf2b15ef9d";
 const LOGIN_MAX_TRIES = 5;
@@ -315,7 +336,7 @@ const LEVELS = ["1A","2A","3A","4A","5A","Diplômé"];
 const FILIERES = ["Actuariat","Éco-stat","PME-PMI"];
 const EXP_TYPES = ["Stage","Alternance","CDI","CDD","Autre"];
 const NAME_RE = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,40}$/;
-const VALID_STATUSES = ["approved","pending","placeholder","rejected"];
+const VALID_STATUSES = ["approved","pending","placeholder","placeholder_pending","rejected"];
 
 /* =========================================================================
    STATE
@@ -353,7 +374,10 @@ function isValidPersonRecord(p){
     && typeof p.prenom === "string" && p.prenom.length < 60
     && typeof p.nom === "string" && p.nom.length < 60
     && typeof p.level === "string" && LEVELS.includes(p.level)
-    && typeof p.status === "string" && VALID_STATUSES.includes(p.status);
+    && typeof p.status === "string" && VALID_STATUSES.includes(p.status)
+    && (p.parrainIds === undefined || Array.isArray(p.parrainIds))
+    && (p.parrainId === undefined || p.parrainId === null || typeof p.parrainId === "string")
+    && (p.pendingSourceIds === undefined || Array.isArray(p.pendingSourceIds));
 }
 
 /* =========================================================================
@@ -363,11 +387,21 @@ function isValidPersonRecord(p){
   try{
     const snap = await peopleCol.get();
     const raw = snap.docs.map(d => d.data());
-    people = raw.filter(isValidPersonRecord);
+    people = raw.filter(isValidPersonRecord).map(migratePersonRecord);
   }catch(e){
     console.error("Firestore load error:", e);
     people = [];
   }
+}
+
+// Ancien format : un seul champ "parrainId" (string|null).
+// Nouveau format : "parrainIds" (tableau), pour permettre plusieurs parrains.
+// Cette fonction convertit les vieilles fiches à la volée, sans casser les données existantes.
+function migratePersonRecord(p){
+  if(!Array.isArray(p.parrainIds)){
+    p.parrainIds = p.parrainId ? [p.parrainId] : [];
+  }
+  return p;
 }
 
 
@@ -398,16 +432,48 @@ function levelBadgeClass(level){
 }
 function approvedPeople(){ return people.filter(p => p.status === "approved"); }
 function pendingPeople(){ return people.filter(p => p.status === "pending"); }
-function placeholderPeople(){ return people.filter(p => p.status === "placeholder"); }
+// Inclut aussi les placeholders "en attente" (créés via une fiche pas encore validée
+// par l'admin) : l'admin doit pouvoir les voir, même s'ils ne sont pas encore dans l'arbre.
+function placeholderPeople(){ return people.filter(p => p.status === "placeholder" || p.status === "placeholder_pending"); }
+// Seuls les statuts "approved" et "placeholder" (confirmé) apparaissent dans l'arbre.
+// "placeholder_pending" reste invisible tant que la fiche qui l'a fait naître n'est
+// pas validée par l'admin.
 function visiblePeople(){ return people.filter(p => p.status === "approved" || p.status === "placeholder"); }
 function findPerson(id){ return people.find(p => p.id === id); }
 function fullName(p){ return `${p.prenom} ${p.nom}`; }
+// Une personne peut avoir plusieurs parrains : parrainIds est un tableau.
+function parrainIdsOf(p){ return Array.isArray(p.parrainIds) ? p.parrainIds : []; }
+function parrainsOf(p){ return parrainIdsOf(p).map(findPerson).filter(Boolean); }
+// Seuls les liens qui pointent vers une personne qui existe encore comptent pour dire
+// si quelqu'un a "un parrain" (au cas où une fiche a été supprimée entretemps).
+function validParrainIds(p){ return parrainIdsOf(p).filter(id => findPerson(id)); }
+function addParrainId(person, parrainId){
+  if(!parrainId) return;
+  if(!Array.isArray(person.parrainIds)) person.parrainIds = [];
+  if(!person.parrainIds.includes(parrainId)) person.parrainIds.push(parrainId);
+}
 function childrenOf(id){
-  return visiblePeople().filter(p => p.parrainId === id)
+  return visiblePeople().filter(p => parrainIdsOf(p).includes(id))
     .sort((a,b)=> fullName(a).localeCompare(fullName(b)));
 }
 function roots(){
-  return visiblePeople().filter(p => !p.parrainId || !findPerson(p.parrainId))
+  return visiblePeople().filter(p => validParrainIds(p).length === 0)
+    .sort((a,b)=> fullName(a).localeCompare(fullName(b)));
+}
+// Le "parrain principal" détermine la position d'une personne dans l'arbre (une seule
+// case par personne). C'est le premier parrain valide de la liste — en pratique celui
+// choisi au moment de l'inscription, donc sa branche ne bouge jamais quand un parrain
+// supplémentaire est ajouté ensuite par quelqu'un d'autre.
+function primaryParrainId(p){
+  const valid = validParrainIds(p);
+  return valid.length ? valid[0] : null;
+}
+// Enfants "principaux" au sens de l'arbre : ceux dont CETTE personne est le parrain
+// principal. Sert uniquement à construire la structure de l'arbre (une case par
+// personne) ; childrenOf() ci-dessus reste utilisé partout ailleurs pour lister TOUS
+// les filleuls (y compris via un parrainage secondaire).
+function primaryChildrenOf(id){
+  return visiblePeople().filter(p => primaryParrainId(p) === id)
     .sort((a,b)=> fullName(a).localeCompare(fullName(b)));
 }
 
@@ -497,17 +563,27 @@ function render(){
    ARBRE — diagramme SVG avec branches
    ========================================================================= */
 const TREE_NODE_W = 178, TREE_NODE_H = 60, TREE_GAP_X = 18, TREE_LEVEL_H = 104,
-      TREE_PAD_X = 24, TREE_PAD_TOP = 20, TREE_FAMILY_GAP = 50, TREE_STEM = 20;
+      TREE_PAD_X = 24, TREE_PAD_TOP = 20, TREE_FAMILY_GAP = 50, TREE_STEM = 20,
+      TREE_ROW_GUTTER_W = 56;
 
-function buildTreeWrapper(person, depth){
-  const realKids = childrenOf(person.id);
+// pathIds = chaîne des ancêtres du nœud courant, sur CE chemin précis (garde-fou
+// contre une boucle de parrainage principal mal formée dans les données).
+// Chaque personne n'apparaît désormais qu'UNE SEULE FOIS dans l'arbre, à sa position
+// "principale" (son premier parrain valide) — les parrains supplémentaires sont
+// affichés séparément comme des traits qui convergent vers cette même case
+// (voir buildExtraLinks plus bas), au lieu de dupliquer la case elle-même.
+function buildTreeWrapper(person, depth, pathIds){
+  pathIds = pathIds || new Set();
+  const nextPath = new Set(pathIds);
+  nextPath.add(person.id);
+  const realKids = primaryChildrenOf(person.id).filter(k => !nextPath.has(k.id));
   const collapsed = collapsedIds.has(person.id);
   return {
     person, depth,
     hasRealChildren: realKids.length > 0,
     realChildCount: realKids.length,
     collapsed,
-    children: collapsed ? [] : realKids.map(k => buildTreeWrapper(k, depth+1)),
+    children: collapsed ? [] : realKids.map(k => buildTreeWrapper(k, depth+1, nextPath)),
   };
 }
 function measureTreeWidth(node){
@@ -517,8 +593,11 @@ function measureTreeWidth(node){
   node._w = Math.max(w, TREE_NODE_W + TREE_GAP_X);
   return node._w;
 }
+// Ne calcule QUE la position horizontale (x) ici. La position verticale (y) est
+// affectée séparément après coup, en fonction de la promo effective de chacun
+// (voir computeForestLayout) — pas de la profondeur de parrainage — pour que tout
+// le monde d'une même promo (1A, 2A, 3A…) se retrouve sur la même ligne horizontale.
 function assignTreeX(node, xStart){
-  node.y = TREE_PAD_TOP + node.depth * TREE_LEVEL_H;
   if(node.children.length === 0){
     node.x = xStart + node._w/2;
     return;
@@ -532,11 +611,77 @@ function flattenTree(node, arr){
   arr.push(node);
   node.children.forEach(c => flattenTree(c, arr));
 }
+// Remonte la chaîne des parrains PRINCIPAUX jusqu'à la racine de la famille de cette
+// personne (le fondateur de sa branche).
+function rootOf(person){
+  let cur = person;
+  let guard = 0;
+  while(guard++ < 500){
+    const pid = primaryParrainId(cur);
+    if(!pid) return cur;
+    const parent = findPerson(pid);
+    if(!parent) return cur;
+    cur = parent;
+  }
+  return cur;
+}
+// Réordonne les familles racines pour que deux familles reliées par un second
+// parrainage (trait pointillé) se retrouvent voisines dans l'arbre, au lieu que le
+// trait traverse tout le diagramme et le rende illisible. On ne touche pas à
+// l'organisation interne de chaque famille, seulement l'ordre des colonnes.
+function orderRootsForLayout(rts){
+  if(rts.length <= 2) return rts;
+
+  // Poids de connexion entre deux familles = nombre de parrainages secondaires
+  // qui les relient.
+  const weight = new Map();
+  const addWeight = (a, b) => {
+    if(a === b) return;
+    const key = a < b ? a + "|" + b : b + "|" + a;
+    weight.set(key, (weight.get(key) || 0) + 1);
+  };
+  visiblePeople().forEach(person => {
+    const primary = primaryParrainId(person);
+    validParrainIds(person).forEach(pid => {
+      if(pid === primary) return;
+      const parentPerson = findPerson(pid);
+      if(!parentPerson) return;
+      addWeight(rootOf(person).id, rootOf(parentPerson).id);
+    });
+  });
+  if(weight.size === 0) return rts; // aucun lien inter-familles : ordre alphabétique inchangé
+
+  const weightBetween = (a, b) => weight.get(a < b ? a + "|" + b : b + "|" + a) || 0;
+
+  // Chaînage glouton : à chaque étape, on ajoute la famille restante la plus
+  // connectée à la dernière placée ; à défaut de connexion, on garde l'ordre
+  // alphabétique d'origine pour rester stable et prévisible.
+  const remaining = rts.slice();
+  const order = [];
+  let startIdx = 0, bestDeg = -1;
+  rts.forEach((r, i) => {
+    let deg = 0;
+    weight.forEach((w, key) => { const [a,b] = key.split("|"); if(a===r.id || b===r.id) deg += w; });
+    if(deg > bestDeg){ bestDeg = deg; startIdx = i; }
+  });
+  order.push(remaining.splice(startIdx,1)[0]);
+
+  while(remaining.length){
+    const last = order[order.length-1];
+    let bestI = -1, bestW = -1;
+    remaining.forEach((r, i) => {
+      const w = weightBetween(last.id, r.id);
+      if(w > bestW){ bestW = w; bestI = i; }
+    });
+    if(bestW <= 0) bestI = 0; // pas de lien : on avance dans l'ordre alphabétique restant
+    order.push(remaining.splice(bestI,1)[0]);
+  }
+  return order;
+}
 function computeForestLayout(){
-  const rts = roots();
-  let cursorX = TREE_PAD_X;
+  const rts = orderRootsForLayout(roots());
+  let cursorX = TREE_PAD_X + TREE_ROW_GUTTER_W;
   const allNodes = [];
-  let maxDepth = 0;
   rts.forEach(person => {
     const w = buildTreeWrapper(person, 0);
     measureTreeWidth(w);
@@ -544,27 +689,61 @@ function computeForestLayout(){
     cursorX += w._w + TREE_FAMILY_GAP;
     flattenTree(w, allNodes);
   });
-  allNodes.forEach(n => { if(n.depth > maxDepth) maxDepth = n.depth; });
+  // Position verticale = promo effective (1A, 2A, 3A… 6A+), pas la profondeur dans
+  // l'arbre de parrainage : deux personnes de la même promo s'alignent donc toujours
+  // sur la même ligne, même si elles sont dans des branches de parrainage différentes.
+  // Sens inversé : les plus anciens (promo la plus haute) en haut, les 1A en bas —
+  // d'où les deux passes : il faut connaître maxPromo avant de placer qui que ce soit.
+  let maxPromo = 1;
+  allNodes.forEach(n => {
+    n.promo = effectiveLevelInfo(n.person).promo || 1;
+    if(n.promo > maxPromo) maxPromo = n.promo;
+  });
+  allNodes.forEach(n => {
+    n.y = TREE_PAD_TOP + (maxPromo - n.promo) * TREE_LEVEL_H;
+  });
   const totalWidth = Math.max(cursorX - TREE_FAMILY_GAP + TREE_PAD_X, 320);
-  const totalHeight = TREE_PAD_TOP + (maxDepth+1) * TREE_LEVEL_H + 20;
-  return { allNodes, totalWidth, totalHeight };
+  const totalHeight = TREE_PAD_TOP + maxPromo * TREE_LEVEL_H + 20;
+  const extraLinks = buildExtraLinks(allNodes);
+  return { allNodes, extraLinks, totalWidth, totalHeight, maxPromo };
+}
+// Pour chaque personne ayant plus d'un parrain, la position dans l'arbre est fixée
+// par son parrain PRINCIPAL (voir primaryParrainId). Les parrains supplémentaires
+// n'ont pas de case à eux : on relie simplement leur case existante à l'unique case
+// de leur filleul, comme deux branches qui se rejoignent sur un même enfant.
+function buildExtraLinks(allNodes){
+  const byId = new Map(allNodes.map(n => [n.person.id, n]));
+  const links = [];
+  allNodes.forEach(n => {
+    const primary = primaryParrainId(n.person);
+    validParrainIds(n.person).forEach(pid => {
+      if(pid === primary) return;
+      const parentNode = byId.get(pid);
+      if(!parentNode) return; // parrain hors-champ (branche repliée ailleurs) : rien à tracer
+      links.push({ from: parentNode, to: n });
+    });
+  });
+  return links;
 }
 function renderTreeCard(n, matchIds){
   const p = n.person;
   const isPh = p.status === "placeholder";
   const x = n.x - TREE_NODE_W/2, y = n.y;
   const info = effectiveLevelInfo(p);
+  const multiParrain = validParrainIds(p).length > 1;
   let cls = "tree-card";
   if(isPh) cls += " tree-card-placeholder";
   if(matchIds){
     if(matchIds.has(p.id)) cls += " tree-card-match";
     else cls += " tree-card-dim";
   }
+  const titleSuffix = multiParrain ? " — plusieurs parrains (voir les traits pointillés)" : "";
   return `<foreignObject x="${x}" y="${y}" width="${TREE_NODE_W}" height="${TREE_NODE_H}">
     <div xmlns="http://www.w3.org/1999/xhtml" class="${cls}">
-      <div class="tree-card-main" data-open-profile="${p.id}" title="${esc(fullName(p))} — ${esc(info.label)}">
+      <div class="tree-card-main" data-open-profile="${p.id}" title="${esc(fullName(p))} — ${esc(info.label)}${titleSuffix}">
         <span class="badge ${info.badgeClass}">${esc(info.label)}</span>
         <span class="tree-card-name ${isPh?'placeholder-name':''}">${esc(fullName(p))}</span>
+        ${multiParrain ? `<span title="Plusieurs parrains" style="font-size:11px;color:var(--amber-dark);flex-shrink:0;">⋔</span>` : ""}
       </div>
       ${n.hasRealChildren ? `<button type="button" class="tree-toggle" data-toggle-collapse="${p.id}">${n.collapsed?'▸ déplier':'▾'} ${n.realChildCount} filleul${n.realChildCount>1?'s':''}</button>` : ""}
     </div>
@@ -588,15 +767,48 @@ function renderTreeLinks(n, matchIds){
   });
   return out;
 }
+// Trait en courbe (pointillé, ambré) reliant un parrain supplémentaire directement
+// à la case unique de son filleul — le "second parent" qui rejoint l'enfant, comme
+// dans un arbre généalogique classique.
+function renderExtraLink(link, matchIds){
+  const x1 = link.from.x, y1 = link.from.y + TREE_NODE_H;
+  const x2 = link.to.x, y2 = link.to.y;
+  const midY = (y1 + y2) / 2;
+  const dim = matchIds && !matchIds.has(link.from.person.id) && !matchIds.has(link.to.person.id);
+  const cls = dim ? "tree-link-extra dim" : "tree-link-extra";
+  return `<path class="${cls}" d="M${x1},${y1} C${x1},${midY} ${x2},${midY} ${x2},${y2}" />`;
+}
 
-// remonte tous les ancêtres d'une personne pour "ne pas casser" une recherche
+// Bande de repères à gauche + lignes pointillées horizontales : une ligne par promo
+// (1A, 2A, 3A… 6A+), pour que l'alignement horizontal des cartes d'une même année
+// saute aux yeux.
+function renderPromoRows(maxPromo, totalWidth){
+  let out = "";
+  for(let i=1; i<=maxPromo; i++){
+    const y = TREE_PAD_TOP + (maxPromo - i) * TREE_LEVEL_H;
+    const cls = i <= 5 ? "b" + i + "A" : "bAlumni";
+    const label = i + "A";
+    out += `<line x1="0" y1="${y - 10}" x2="${totalWidth}" y2="${y - 10}" class="tree-row-divider" />`;
+    out += `<foreignObject x="0" y="${y}" width="${TREE_ROW_GUTTER_W - 8}" height="${TREE_NODE_H}">
+      <div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:center;height:100%;">
+        <span class="badge ${cls}" style="opacity:.85;">${esc(label)}</span>
+      </div>
+    </foreignObject>`;
+  }
+  return out;
+}
+
+// remonte tous les ancêtres d'une personne (par tous ses parrains) pour "ne pas casser" une recherche
 function ancestorsOf(id, acc){
   acc = acc || new Set();
   const p = findPerson(id);
-  if(!p || !p.parrainId) return acc;
-  if(acc.has(p.parrainId)) return acc; // sécurité
-  acc.add(p.parrainId);
-  return ancestorsOf(p.parrainId, acc);
+  if(!p) return acc;
+  parrainIdsOf(p).forEach(pid=>{
+    if(acc.has(pid)) return; // déjà vu, évite les boucles
+    acc.add(pid);
+    ancestorsOf(pid, acc);
+  });
+  return acc;
 }
 
 function renderArbre(){
@@ -608,15 +820,16 @@ function renderArbre(){
         return `<span><span class="badge ${cls}">${l}</span></span>`;
       }).join("")}
       <span>Contour pointillé = filleul non inscrit</span>
+      <span><span style="display:inline-block;width:18px;height:0;border-top:2px dashed var(--amber);"></span> Second parrain (même personne)</span>
     </div>`;
   if(roots().length === 0){
     return `<div class="panel">
-      <p class="intro">Chaque branche part d'un membre fondateur (sans parrain) et descend vers ses filleuls, promo après promo.</p>
+      <p class="intro">Chaque branche part d'un membre fondateur (sans parrain) en haut et descend vers ses filleuls, des plus anciens (en haut) aux 1A (en bas).</p>
       ${legend}
       <div class="empty">Aucune famille pour l'instant. Sois le premier à <a href="#" data-goto="rejoindre">rejoindre l'arbre</a>.</div>
     </div>`;
   }
-  const { allNodes, totalWidth, totalHeight } = computeForestLayout();
+  const { allNodes, extraLinks, totalWidth, totalHeight, maxPromo } = computeForestLayout();
 
   const q = treeSearch.trim().toLowerCase();
   let matchIds = null;
@@ -636,7 +849,9 @@ function renderArbre(){
     });
   }
 
+  const rowsHtml = renderPromoRows(maxPromo, totalWidth);
   const linksHtml = allNodes.filter(n => n.children.length>0).map(n => renderTreeLinks(n, matchIds)).join("");
+  const extraLinksHtml = extraLinks.map(link => renderExtraLink(link, matchIds)).join("");
   const cardsHtml = allNodes.map(n => renderTreeCard(n, matchIds)).join("");
 
   const zw = Math.round(totalWidth * treeZoom);
@@ -656,12 +871,14 @@ function renderArbre(){
   </div>`;
 
   return `<div class="panel">
-    <p class="intro">Chaque branche part d'un membre fondateur (sans parrain) et descend vers ses filleuls, promo après promo. Quand un Diplômé a des filleuls, sa promo « visible » monte à 6A, 7A, etc. Clique sur une carte pour voir le profil, sur ▾ pour replier une branche, ou utilise la recherche pour retrouver quelqu'un.</p>
+    <p class="intro">Chaque branche part d'un membre fondateur (sans parrain) et descend vers ses filleuls. Les plus anciens sont en haut, les 1A tout en bas. Les lignes horizontales correspondent aux promos (1A, 2A, 3A…) : tout le monde de la même année est aligné sur la même ligne, quelle que soit sa branche de parrainage. Quand un Diplômé a des filleuls, sa promo « visible » monte à 6A, 7A, etc. — et remonte donc plus haut dans l'arbre. Une personne avec plusieurs parrains n'a qu'une seule case, reliée à chacun de ses parrains. Clique sur une carte pour voir le profil, sur ▾ pour replier une branche, ou utilise la recherche pour retrouver quelqu'un.</p>
     ${controls}
     ${legend}
     <div class="tree-svg-wrap" id="tree-svg-wrap">
       <svg width="${zw}" height="${zh}" viewBox="0 0 ${totalWidth} ${totalHeight}" preserveAspectRatio="xMinYMin meet">
+        <g>${rowsHtml}</g>
         <g>${linksHtml}</g>
+        <g>${extraLinksHtml}</g>
         <g>${cardsHtml}</g>
       </svg>
     </div>
@@ -669,18 +886,27 @@ function renderArbre(){
 }
 
 
-function findOrCreatePlaceholder(prenom, nom, level = "1A"){
+// sourceId = id de la fiche (en attente) qui motive la création de ce placeholder.
+// Tant qu'un admin n'a pas validé au moins une des fiches sources, le placeholder
+// reste en status "placeholder_pending" et n'apparaît donc pas dans l'arbre.
+function findOrCreatePlaceholder(prenom, nom, level = "1A", sourceId = null){
   const p1 = prenom.trim().toLowerCase();
   const n1 = nom.trim().toLowerCase();
 
-  // Si un placeholder existe déjà, on le réutilise
+  // Si un placeholder (visible ou en attente) existe déjà, on le réutilise
   let existing = people.find(p =>
-    p.status === "placeholder" &&
+    (p.status === "placeholder" || p.status === "placeholder_pending") &&
     p.prenom.trim().toLowerCase() === p1 &&
     p.nom.trim().toLowerCase() === n1
   );
 
-  if(existing) return existing;
+  if(existing){
+    if(existing.status === "placeholder_pending" && sourceId){
+      if(!Array.isArray(existing.pendingSourceIds)) existing.pendingSourceIds = [];
+      if(!existing.pendingSourceIds.includes(sourceId)) existing.pendingSourceIds.push(sourceId);
+    }
+    return existing;
+  }
 
   const placeholder = {
     id: uid(),
@@ -688,14 +914,64 @@ function findOrCreatePlaceholder(prenom, nom, level = "1A"){
     nom: nom.trim(),
     level,
     anneeDiplome: "",
-    parrainId: null,
+    parrainIds: [],
     bde: { membre:false, nom:"" },
     experiences: [],
-    status: "placeholder",
+    status: sourceId ? "placeholder_pending" : "placeholder",
+    pendingSourceIds: sourceId ? [sourceId] : [],
     submittedAt: new Date().toISOString()
   };
 
   people.push(placeholder);
+  return placeholder;
+}
+
+// Une fois qu'une fiche est validée par l'admin, les placeholders qu'elle avait fait
+// naître (futur parrain, filleul non inscrit) deviennent visibles dans l'arbre.
+function revealPlaceholdersFor(personId){
+  people.forEach(p=>{
+    if(p.status === "placeholder_pending" && Array.isArray(p.pendingSourceIds) && p.pendingSourceIds.includes(personId)){
+      p.status = "placeholder";
+    }
+  });
+}
+
+// Si une fiche est rejetée, on retire sa trace des placeholders qu'elle avait fait
+// naître, et on supprime ceux qui n'ont plus aucune raison d'exister (ni autre source
+// en attente, ni lien de parrainage confirmé).
+function cleanupPlaceholdersForRejected(rejectedId){
+  people.forEach(p=>{
+    if(p.status === "placeholder_pending" && Array.isArray(p.pendingSourceIds)){
+      p.pendingSourceIds = p.pendingSourceIds.filter(sid => sid !== rejectedId);
+    }
+  });
+  people = people.filter(p=>{
+    if(p.status !== "placeholder_pending") return true;
+    const noSources = !p.pendingSourceIds || p.pendingSourceIds.length === 0;
+    const noLinks = validParrainIds(p).length === 0;
+    return !(noSources && noLinks);
+  });
+}
+
+// Quand quelqu'un déclare un filleul dans son formulaire : si une fiche (réelle ou
+// déjà déclarée par quelqu'un d'autre) correspond à ce nom, on AJOUTE ce parrain
+// à sa liste de parrains au lieu de créer une nouvelle fiche en double — la branche
+// existante (ex: filleul-parrain1) n'est pas modifiée, un second lien de parrainage
+// (filleul-parrain2) est simplement ajouté sur la même fiche.
+function attachFilleul(prenom, nom, level, parrainId, sourceId){
+  const p1 = prenom.trim().toLowerCase(), n1 = nom.trim().toLowerCase();
+  if(!p1 || !n1 || !parrainId) return null;
+
+  const existing = people.find(p => p.status !== "rejected" &&
+    p.prenom.trim().toLowerCase() === p1 && p.nom.trim().toLowerCase() === n1);
+
+  if(existing){
+    addParrainId(existing, parrainId);
+    return existing;
+  }
+
+  const placeholder = findOrCreatePlaceholder(prenom, nom, level, sourceId);
+  addParrainId(placeholder, parrainId);
   return placeholder;
 }
 
@@ -832,16 +1108,16 @@ function renderRejoindre(){
 
       ${claimed ? `
         <div class="success-box">
-          Tu réclames la fiche déclarée par <strong>${esc(fullName(findPerson(claimed.parrainId) || {prenom:'?',nom:''}))}</strong> (${esc(claimed.level)} déclaré). Le lien parrain → filleul est conservé automatiquement.
+          Tu réclames la fiche déclarée par <strong>${parrainsOf(claimed).length ? parrainsOf(claimed).map(fullName).map(esc).join(", ") : "?"}</strong> (${esc(claimed.level)} déclaré). ${parrainsOf(claimed).length>1 ? "Ces liens parrain → filleul sont" : "Ce lien parrain → filleul est"} conservé${parrainsOf(claimed).length>1?'s':''} automatiquement.
           <div style="margin-top:8px;"><button type="button" class="btn secondary small" id="unclaim">Ce n'est pas moi / annuler</button></div>
         </div>
       ` : phMatches.length>0 ? `
         <div class="warning-box">
           <div style="margin-bottom:8px;">On dirait que quelqu'un t'a déjà déclaré comme filleul. Est-ce toi ?</div>
           ${phMatches.map(m => {
-            const par = m.parrainId ? findPerson(m.parrainId) : null;
+            const pars = parrainsOf(m);
             return `<div class="search-picker-item" style="background:var(--white);border:1px solid var(--line);border-radius:3px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;" data-claim-placeholder="${m.id}">
-              <span>${esc(fullName(m))} — ${esc(m.level)} ${par? '· déclaré par '+esc(fullName(par)) : ''}</span>
+              <span>${esc(fullName(m))} — ${esc(m.level)} ${pars.length? '· déclaré par '+pars.map(fullName).map(esc).join(", ") : ''}</span>
               <span class="btn small" style="pointer-events:none;">C'est moi</span>
             </div>`;
           }).join("")}
@@ -1068,7 +1344,7 @@ function renderAdmin(){
     ${ph.length===0 ? `<div class="empty">Aucun.</div>` : ph.map(p=>`
       <div class="admin-item">
         <div class="admin-item-top">
-          <div><strong>${esc(fullName(p))}</strong> — ${esc(p.level)} <span class="node-meta">déclaré par ${esc(fullName(findPerson(p.parrainId)||{prenom:'?',nom:''}))}</span></div>
+          <div><strong>${esc(fullName(p))}</strong> — ${esc(p.level)} ${p.status==="placeholder_pending" ? `<span class="pill pending">en attente de validation</span>` : `<span class="pill approved">visible dans l'arbre</span>`} <span class="node-meta">déclaré par ${parrainsOf(p).length ? parrainsOf(p).map(fullName).map(esc).join(", ") : "?"}</span></div>
           <div class="admin-actions">
             <button class="btn danger small" data-delete-person="${p.id}">Supprimer</button>
           </div>
@@ -1098,7 +1374,7 @@ function renderAdmin(){
   `;
 }
 function renderAdminPendingItem(p){
-  const parrain = p.parrainId ? findPerson(p.parrainId) : null;
+  const parrains = parrainsOf(p);
   const dup = nameTaken(p.prenom, p.nom, p.id);
   return `<div class="admin-item">
     <div class="admin-item-top">
@@ -1108,7 +1384,7 @@ function renderAdminPendingItem(p){
       </div>
     </div>
     <div class="node-meta" style="margin-top:6px;">
-      Parrain déclaré : ${parrain ? esc(fullName(parrain)) + " (" + esc(parrain.level) + ")" : "aucun (fondateur déclaré)"}
+      Parrain${parrains.length>1?'s déclarés':' déclaré'} : ${parrains.length ? parrains.map(pr=>esc(fullName(pr))+" ("+esc(pr.level)+")").join(", ") : "aucun (fondateur déclaré)"}
       ${p.filiere ? " · filière " + esc(p.filiere) : " · filière non renseignée"}
       ${p.bde?.membre ? " · BDE " + esc(p.bde.nom) : ""}
     </div>
@@ -1144,11 +1420,11 @@ function renderAdminEditModal(){
         </select>
       </div>
       <div class="field">
-        <label>Parrain (ID interne, laisser vide si aucun)</label>
-        <select id="edit-parrain">
-          <option value="">— Aucun —</option>
-          ${approvedPeople().filter(x=>x.id!==p.id).map(x=>`<option value="${x.id}" ${p.parrainId===x.id?'selected':''}>${esc(fullName(x))} (${x.level})</option>`).join("")}
+        <label>Parrain(s)</label>
+        <select id="edit-parrain" multiple size="6">
+          ${approvedPeople().filter(x=>x.id!==p.id).map(x=>`<option value="${x.id}" ${parrainIdsOf(p).includes(x.id)?'selected':''}>${esc(fullName(x))} (${x.level})</option>`).join("")}
         </select>
+        <div class="hint" style="margin-top:5px;">Ctrl/Cmd-clic (ou Cmd sur Mac) pour sélectionner plusieurs parrains, ou n'en sélectionner aucun.</div>
       </div>
       <button class="btn" id="save-edit">Enregistrer</button>
     </div>
@@ -1162,13 +1438,11 @@ function openProfileModal(id){
   const p = findPerson(id);
   if(!p) return;
   const root = $("#modal-root");
-  const parrain = p.parrainId ? findPerson(p.parrainId) : null;
+  const parrains = parrainsOf(p);
   const kids = childrenOf(p.id);
-  const isPh = p.status === "placeholder";
+  const isPh = p.status === "placeholder" || p.status === "placeholder_pending";
   const exps = (p.experiences||[]).filter(e => isAdmin || e.visible);
   const info = effectiveLevelInfo(p);
-  const parrainInfo = parrain ? effectiveLevelInfo(parrain) : null;
-
   root.innerHTML = `
     <div class="modal-backdrop" data-close-modal></div>
     <div class="modal-box">
@@ -1181,11 +1455,15 @@ function openProfileModal(id){
 
       <div class="modal-block">
         <h4>Famille</h4>
-        <div class="node-meta">Parrain : ${parrain ? `${esc(fullName(parrain))} (${esc(parrainInfo.label)})` : "— (fondateur)"}</div>
+        <div class="node-meta">Parrain${parrains.length>1?'s':''} : ${parrains.length ? parrains.map(pr=>{
+          const pri = effectiveLevelInfo(pr);
+          return esc(fullName(pr))+" ("+esc(pri.label)+")";
+        }).join(", ") : "— (fondateur)"}</div>
         <div class="node-meta">Filleuls : ${kids.length ? kids.map(k=>{
           const ki = effectiveLevelInfo(k);
           return esc(fullName(k))+" ("+esc(ki.label)+")";
         }).join(", ") : "aucun pour le moment"}</div>
+        ${parrains.length>1 ? `<div class="node-meta" style="margin-top:6px;font-style:italic;">Plusieurs parrains : cette fiche apparaît donc dans plusieurs branches de l'arbre.</div>` : ""}
       </div>
 
       ${p.bde?.membre ? `<div class="modal-block"><h4>BDE</h4><div class="node-meta">${esc(p.bde.nom)}</div></div>` : ""}
@@ -1272,7 +1550,7 @@ function attachViewListeners(){
     });
     $("#tree-expand-all")?.addEventListener("click", ()=>{ collapsedIds.clear(); render(); });
     $("#tree-collapse-all")?.addEventListener("click", ()=>{
-      collapsedIds = new Set(visiblePeople().filter(p=>childrenOf(p.id).length>0).map(p=>p.id));
+      collapsedIds = new Set(visiblePeople().filter(p=>primaryChildrenOf(p.id).length>0).map(p=>p.id));
       render();
     });
     $("#tree-zoom-in")?.addEventListener("click", ()=>{ treeZoom = Math.min(2.5, Math.round((treeZoom+0.1)*10)/10); render(); });
@@ -1352,9 +1630,11 @@ function attachJoinListeners(){
     let person;
     const claimTarget = f.claimId ? findPerson(f.claimId) : null;
 
-    if(claimTarget && claimTarget.status === "placeholder"){
+    if(claimTarget && (claimTarget.status === "placeholder" || claimTarget.status === "placeholder_pending")){
       // Réclamer la fiche déclarée : on la transforme au lieu de créer un doublon,
       // pour préserver son id et les liens vers ses éventuels propres filleuls.
+      // Elle redevient une fiche "pending" classique, soumise à validation admin
+      // comme n'importe quelle autre inscription.
       claimTarget.prenom = f.prenom.trim();
       claimTarget.nom = f.nom.trim();
       claimTarget.level = f.level;
@@ -1363,10 +1643,15 @@ function attachJoinListeners(){
       claimTarget.bde = { membre: f.bdeMembre, nom: f.bdeMembre ? f.bdeNom.trim() : "" };
       claimTarget.experiences = f.experiences.map(x=>({...x}));
       claimTarget.status = "pending";
+      claimTarget.pendingSourceIds = [];
       claimTarget.submittedAt = new Date().toISOString();
       person = claimTarget;
     } else {
 
+      // On fixe l'id dès maintenant : les placeholders créés ci-dessous (futur parrain,
+      // filleuls non inscrits) s'en servent comme "source" — tant que CETTE fiche n'est
+      // pas validée par l'admin, ils restent invisibles dans l'arbre.
+      const newId = uid();
       let parrainId = null;
 
       if(f.parrainMode === "choisi"){
@@ -1377,7 +1662,8 @@ function attachJoinListeners(){
         const futurParrain = findOrCreatePlaceholder(
           f.parrainNonInscrit.prenom,
           f.parrainNonInscrit.nom,
-          f.parrainNonInscrit.level
+          f.parrainNonInscrit.level,
+          newId
         );
 
         parrainId = futurParrain.id;
@@ -1388,13 +1674,13 @@ function attachJoinListeners(){
       }
 
       person = {
-        id: uid(),
+        id: newId,
         prenom: f.prenom.trim(),
         nom: f.nom.trim(),
         level: f.level,
         anneeDiplome: parseInt(f.anneeDiplome,10),
         filiere: FILIERES.includes(f.filiere) ? f.filiere : "",
-        parrainId: parrainId,
+        parrainIds: parrainId ? [parrainId] : [],
         bde: {
           membre: f.bdeMembre,
           nom: f.bdeMembre ? f.bdeNom.trim() : ""
@@ -1407,17 +1693,12 @@ function attachJoinListeners(){
       people.push(person);
     }
 
-    // filleuls connus -> placeholders
+    // filleuls connus -> on relie ce parrain à la fiche existante si elle existe déjà
+    // (réelle ou placeholder), sans jamais créer de doublon de personne. S'il faut créer
+    // un nouveau placeholder, il reste invisible tant que CETTE fiche n'est pas validée.
     (f.filleulsConnus || []).forEach(fl => {
       if(!fl.prenom.trim() || !fl.nom.trim()) return;
-
-      const filleul = findOrCreatePlaceholder(
-        fl.prenom,
-        fl.nom,
-        fl.level
-      );
-
-      filleul.parrainId = person.id;
+      attachFilleul(fl.prenom, fl.nom, fl.level, person.id, person.id);
     });
 
     await savePeople();
@@ -1549,14 +1830,19 @@ function attachAdminListeners(){
   $$("[data-approve]").forEach(el=>{
     el.addEventListener("click", async ()=>{
       const p = findPerson(el.dataset.approve);
-      if(p) p.status = "approved";
+      if(p){
+        p.status = "approved";
+        revealPlaceholdersFor(p.id);
+      }
       await savePeople(); render();
     });
   });
   $$("[data-reject]").forEach(el=>{
     el.addEventListener("click", async ()=>{
       if(!confirm("Rejeter cette demande ? La fiche sera définitivement supprimée.")) return;
-      people = people.filter(p=>p.id !== el.dataset.reject);
+      const id = el.dataset.reject;
+      cleanupPlaceholdersForRejected(id);
+      people = people.filter(p=>p.id !== id);
       await savePeople(); render();
     });
   });
@@ -1565,7 +1851,7 @@ function attachAdminListeners(){
       if(!confirm("Supprimer cette fiche ? Ses filleuls deviendront racines de leur propre branche.")) return;
       const id = el.dataset.deletePerson;
       people = people.filter(p=>p.id !== id);
-      people.forEach(p=>{ if(p.parrainId===id) p.parrainId=null; });
+      people.forEach(p=>{ if(Array.isArray(p.parrainIds)) p.parrainIds = p.parrainIds.filter(pid=>pid!==id); });
       await savePeople(); render();
     });
   });
@@ -1583,7 +1869,13 @@ function attachAdminListeners(){
     p.anneeDiplome = $("#edit-annee").value;
     const editedFiliere = $("#edit-filiere")?.value || "";
     p.filiere = FILIERES.includes(editedFiliere) ? editedFiliere : "";
-    p.parrainId = $("#edit-parrain").value || null;
+    const selectedParrainIds = Array.from($("#edit-parrain").selectedOptions).map(o=>o.value);
+    // On garde l'ordre existant pour les parrains déjà présents (celui en position 0
+    // reste le parrain "principal", donc sa position dans l'arbre ne bouge pas) et on
+    // ajoute les nouveaux à la fin.
+    const keptInOrder = parrainIdsOf(p).filter(id => selectedParrainIds.includes(id));
+    const newlyAdded = selectedParrainIds.filter(id => !keptInOrder.includes(id));
+    p.parrainIds = [...keptInOrder, ...newlyAdded];
     editingId = null;
     await savePeople(); render();
   });
