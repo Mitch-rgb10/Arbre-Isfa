@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
+    /* Thème Sombre (Par défaut) */
     --ink:#f1f5f9;
     --ink-2:#94a3b8;
     --paper:#121824;
@@ -22,8 +23,44 @@
     --white:#1a2333;
     --radius:10px;
   }
+
+  /* Thème Clair */
+  html[data-theme="light"] {
+    --ink:#0f172a;
+    --ink-2:#475569;
+    --paper:#f1f5f9;
+    --paper-2:#e2e8f0;
+    --line:#cbd5e1;
+    --white:#ffffff;
+    --amber:#2563eb;
+    --amber-dark:#1d4ed8;
+    --green-bg:rgba(34, 197, 94, 0.15);
+    --rust-bg:rgba(239, 68, 68, 0.15);
+  }
+
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
+  
+  /* Scrollbars personnalisées au thème du site */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) var(--paper);
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-track {
+    background: var(--paper);
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--line);
+    border-radius: 4px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--ink-2);
+  }
+
   body{
     background:var(--paper);
     color:var(--ink);
@@ -31,6 +68,7 @@
     font-size:15px;
     line-height:1.5;
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.2s, color 0.2s;
   }
   h1,h2,h3,h4{
     font-family:'Fraunces',serif;
@@ -44,7 +82,7 @@
   button{font-family:inherit;cursor:pointer;}
   input,select,textarea{font-family:inherit;font-size:14px;}
 
-  #app{width:100%;margin:0;padding:0 30px 80px;}
+  #app{width:100%;margin:0;padding:0 30px 40px;}
 
   .topbar{
     display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
@@ -54,11 +92,16 @@
     gap:16px;
   }
   .brand{display:flex;align-items:center;gap:14px;}
+  
+  /* Gestion du logo selon le thème */
   .brand-mark{
     height:44px;
     display:flex;align-items:center;justify-content:center;
     flex-shrink:0;
-    filter: brightness(0) invert(1);
+    filter: brightness(0) invert(1); /* Blanc pour thème sombre */
+  }
+  html[data-theme="light"] .brand-mark {
+    filter: none; /* Noir original pour thème clair */
   }
   .brand-mark img{
     height:100%;
@@ -86,7 +129,12 @@
     padding:24px;
     margin-bottom:20px;
     box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s, border-color 0.2s;
   }
+  html[data-theme="light"] .panel {
+    box-shadow: 0 4px 15px -5px rgba(0, 0, 0, 0.05);
+  }
+
   .intro{font-size:13.5px;color:var(--ink-2);margin:0 0 18px;}
   .intro strong{color:var(--ink);}
 
@@ -97,12 +145,27 @@
     background:var(--paper-2);color:var(--ink);
     border:1px solid var(--line);
   }
+  /* Dégradé progressif de couleurs pour les étiquettes de 1A à 20A */
   .badge.b1A{background:#0c4a6e;color:#38bdf8;border-color:#0369a1;}
   .badge.b2A{background:#064e3b;color:#4ade80;border-color:#047857;}
   .badge.b3A{background:#581c87;color:#c084fc;border-color:#7e22ce;}
   .badge.b4A{background:#7c2d12;color:#fb923c;border-color:#c2410c;}
   .badge.b5A{background:#831843;color:#f472b6;border-color:#be185d;}
-  .badge.bDiplome{background:#334155;color:#f8fafc;border-color:#475569;}
+  .badge.b6A{background:#4c1d95;color:#ddd6fe;border-color:#6d28d9;}
+  .badge.b7A{background:#1e3a8a;color:#93c5fd;border-color:#2563eb;}
+  .badge.b8A{background:#134e4a;color:#5eead4;border-color:#0f766e;}
+  .badge.b9A{background:#065f46;color:#6ee7b7;border-color:#059669;}
+  .badge.b10A{background:#365314;color:#bef264;border-color:#4d7c0f;}
+  .badge.b11A{background:#713f12;color:#fde047;border-color:#a16207;}
+  .badge.b12A{background:#78350f;color:#fdba74;border-color:#b45309;}
+  .badge.b13A{background:#7c2d12;color:#fca5a5;border-color:#ea580c;}
+  .badge.b14A{background:#881337;color:#fda4af;border-color:#e11d48;}
+  .badge.b15A{background:#701a75;color:#f0abfc;border-color:#a21caf;}
+  .badge.b16A{background:#581c87;color:#e9d5ff;border-color:#7e22ce;}
+  .badge.b17A{background:#312e81;color:#c7d2fe;border-color:#4338ca;}
+  .badge.b18A{background:#1e3a8a;color:#bfdbfe;border-color:#1d4ed8;}
+  .badge.b19A{background:#0f172a;color:#cbd5e1;border-color:#334155;}
+  .badge.b20A{background:#020617;color:#f8fafc;border-color:#475569;}
   .badge.bAlumni{background:#1e293b;color:#cbd5e1;border-color:#334155;}
 
   .pill{
@@ -139,10 +202,10 @@
     position:relative;
   }
   
-  .tree-link{stroke:#475569;stroke-width:2;fill:none;} 
-  .tree-link.dim{stroke:#2a3649;opacity:0.3;}
+  .tree-link{stroke:var(--ink-2);stroke-width:2;fill:none;} 
+  .tree-link.dim{stroke:var(--line);opacity:0.5;}
   .tree-link-extra{stroke:var(--amber);stroke-width:2;fill:none;stroke-dasharray:6 4;opacity:.9;}
-  .tree-link-extra.dim{stroke:#334155;opacity:.3;}
+  .tree-link-extra.dim{stroke:var(--ink-2);opacity:.4;}
   
   .tree-row-divider{stroke:var(--line);stroke-width:1;stroke-dasharray:2 5;}
   .tree-card{
@@ -153,10 +216,13 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     transition:opacity .15s, box-shadow .15s, border-color .15s;
   }
+  html[data-theme="light"] .tree-card { box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
   .tree-card:hover{
     box-shadow: 0 8px 20px rgba(0,0,0,0.4);
     border-color: #64748b;
   }
+  html[data-theme="light"] .tree-card:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.12); border-color: var(--ink-2); }
+  
   .tree-card-placeholder{border-style:dashed;background:var(--paper);}
   .tree-card-main{display:flex;align-items:center;gap:7px;cursor:pointer;overflow:hidden;}
   .tree-card-main:hover .tree-card-name{color:var(--amber-dark);}
@@ -201,6 +267,10 @@
     background:var(--paper);color:var(--ink);
     transition:border-color 0.15s, box-shadow 0.15s;
   }
+  .field input:disabled, .field select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
   .field input:focus, .field select:focus, .field textarea:focus{
     outline:none;
     border-color:var(--amber);
@@ -219,6 +289,7 @@
     transition:background .12s, transform .05s;
   }
   .btn:hover{background:#cbd5e1;}
+  html[data-theme="light"] .btn:hover{background:var(--ink-2);}
   .btn:active{transform:scale(0.99);}
   .btn.secondary{background:transparent;color:var(--ink);border-color:var(--line);}
   .btn.secondary:hover{background:var(--paper-2);border-color:var(--ink-2);}
@@ -240,16 +311,20 @@
     display:flex;align-items:center;justify-content:space-between;
     padding:9px 12px;border:1px solid #1e40af;background:rgba(30,64,175,0.2);border-radius:var(--radius);font-size:13.5px;
   }
+  html[data-theme="light"] .parrain-chosen { background:rgba(37,99,235,0.1); border-color:#93c5fd;}
 
   .warning-box{
     border:1px solid rgba(239,68,68,0.3);background:var(--rust-bg);color:#fca5a5;
     padding:10px 13px;border-radius:var(--radius);font-size:13px;margin-bottom:14px;
   }
+  html[data-theme="light"] .warning-box { color: #b91c1c; }
   .success-box{
     border:1px solid rgba(34,197,94,0.3);background:var(--green-bg);color:#86efac;
     padding:14px 16px;border-radius:var(--radius);font-size:13.5px;margin-bottom:14px;
   }
+  html[data-theme="light"] .success-box { color: #15803d; }
   .error-text{color:#fca5a5;font-size:12px;margin-top:4px;font-weight:500;}
+  html[data-theme="light"] .error-text { color: #dc2626; }
 
   .filleul-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
   .filleul-row input{flex:1;}
@@ -282,6 +357,42 @@
   .admin-item-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;}
   .admin-actions{display:flex;gap:8px;margin-top:10px;}
   .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+
+  /* Sélecteur de thème en bas à droite */
+  .theme-switcher {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .theme-option {
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    color: var(--ink-2);
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: color 0.15s, background-color 0.15s;
+  }
+  .theme-option:hover {
+    color: var(--ink);
+  }
+  .theme-option.active {
+    color: var(--white);
+    background: var(--ink);
+    font-weight: 600;
+  }
+  html[data-theme="light"] .theme-option.active {
+    color: #ffffff;
+    background: var(--ink);
+  }
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -299,9 +410,16 @@
         <p>ISFA — parrainages &amp; réseau des anciens</p>
       </div>
     </div>
-    <nav class="tabs" id="tabs"></nav>
+    <nav class="tabs" id="tabs" style="align-self: flex-end;"></nav>
   </header>
   <main id="view"></main>
+
+  <footer class="theme-switcher">
+    <span>Thème :</span>
+    <button type="button" class="theme-option" data-set-theme="dark" id="opt-dark">Sombre</button>
+    <span>|</span>
+    <button type="button" class="theme-option" data-set-theme="light" id="opt-light">Clair</button>
+  </footer>
 </div>
 <div id="modal-root"></div>
 
@@ -309,18 +427,34 @@
 (function(){
 'use strict';
 
-document.addEventListener("keydown", e => {
-  const k = e.key;
-  const blocked =
-    k === "F12" ||
-    ((e.ctrlKey || e.metaKey) && e.shiftKey && ["I","J","C"].includes(k.toUpperCase())) ||
-    ((e.ctrlKey || e.metaKey) && k.toUpperCase() === "U");
-  if(blocked) e.preventDefault();
-});
-
 const SUBMIT_MIN_INTERVAL_MS = 10 * 1000;
 const MAX_EXPERIENCES = 20;
 const MAX_FILLEULS_DECLARES = 30;
+
+/* =========================================================================
+   GESTION DU THÈME (Sombre / Clair)
+   ========================================================================= */
+const htmlEl = document.documentElement;
+const savedTheme = localStorage.getItem("isfa-theme") || "dark";
+setTheme(savedTheme);
+
+function setTheme(theme) {
+  htmlEl.setAttribute("data-theme", theme);
+  localStorage.setItem("isfa-theme", theme);
+  const optDark = document.getElementById("opt-dark");
+  const optLight = document.getElementById("opt-light");
+  if(optDark && optLight) {
+    optDark.classList.toggle("active", theme === "dark");
+    optLight.classList.toggle("active", theme === "light");
+  }
+}
+
+document.addEventListener("click", (e) => {
+  const themeBtn = e.target.closest("[data-set-theme]");
+  if(themeBtn) {
+    setTheme(themeBtn.dataset.setTheme);
+  }
+});
 
 const firebaseConfig = {
   apiKey: "AIzaSyCRd5RDzYnLhxVDxHhxuCIMNZoi3fBbdiY",
@@ -335,7 +469,7 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
 const peopleCol = db.collection("people");
-const LEVELS = ["1A","2A","3A","4A","5A","Diplômé"];
+const ALL_LEVELS = ["1A","2A","3A","M1","M2","Diplômé"];
 const FILIERES = ["Actuariat","Éco-stat","PME-PMI"];
 const EXP_TYPES = ["Stage","Alternance","CDI","CDD","Autre"];
 const NAME_RE = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,40}$/;
@@ -365,12 +499,19 @@ function esc(str){
   return String(str ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 function uid(){ return 'p_' + Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+
+/* Fonction pour formater automatiquement les prénoms et noms */
+function formatName(str){
+  if(!str) return "";
+  return str.trim().toLowerCase().replace(/(^|[ \-])([a-zà-öø-ÿ])/g, (match, sep, char) => sep + char.toUpperCase());
+}
+
 function isValidPersonRecord(p){
   return p && typeof p === "object"
     && typeof p.id === "string" && p.id.length > 0 && p.id.length < 100
     && typeof p.prenom === "string" && p.prenom.length < 60
     && typeof p.nom === "string" && p.nom.length < 60
-    && typeof p.level === "string" && LEVELS.includes(p.level)
+    && typeof p.level === "string" && ALL_LEVELS.includes(p.level)
     && typeof p.status === "string" && VALID_STATUSES.includes(p.status)
     && (p.parrainIds === undefined || Array.isArray(p.parrainIds))
     && (p.parrainId === undefined || p.parrainId === null || typeof p.parrainId === "string")
@@ -395,6 +536,8 @@ function migratePersonRecord(p){
   if(!Array.isArray(p.parrainIds)){
     p.parrainIds = p.parrainId ? [p.parrainId] : [];
   }
+  p.prenom = formatName(p.prenom);
+  p.nom = formatName(p.nom);
   return p;
 }
 
@@ -414,10 +557,10 @@ async function savePeople(){
 }
 
 /* =========================================================================
-   HELPERS
+   HELPERS & CALCUL DE PROMO (Année de diplôme / Niveau)
    ========================================================================= */
 function levelBadgeClass(level){
-  if(level === "Diplômé") return "bDiplome";
+  if(level === "Diplômé" || level === "M2") return "bDiplome";
   return "b" + level;
 }
 function approvedPeople(){ return people.filter(p => p.status === "approved"); }
@@ -451,55 +594,110 @@ function primaryChildrenOf(id){
     .sort((a,b)=> fullName(a).localeCompare(fullName(b)));
 }
 
+function calculatePromoNumber(person) {
+  const fil = person.filiere;
+  const lvl = person.level;
+  const yr = parseInt(person.anneeDiplome, 10);
+
+  if ((fil === "Actuariat" || fil === "Éco-stat" || fil === "PME-PMI") && lvl === "Diplômé" && !isNaN(yr)) {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+    let diff = currentYear - yr;
+    if (currentMonth > 7) {
+      diff += 1;
+    }
+    return 3 + diff;
+  }
+
+  if(lvl === "M1") return 2;
+  if(lvl === "M2") return 3;
+  if(lvl !== "Diplômé") {
+    return parseInt(lvl, 10) || 3;
+  }
+  return 3;
+}
+
 function effectiveLevelInfo(person){
   if(!person) return { label:"?", badgeClass:"", promo:0 };
   if(_levelCache.has(person.id)) return _levelCache.get(person.id);
-  _levelCache.set(person.id, { label: person.level, badgeClass: levelBadgeClass(person.level), promo: parseInt(person.level,10) || 5 });
-  let info;
+
+  let n = calculatePromoNumber(person);
+  let badgeClass = "";
+  let label = person.level;
+
+  if(person.level === "M1") { 
+    label = "2A"; 
+    badgeClass = "b2A"; 
+  }
+  else if(person.level === "M2") { 
+    label = "3A"; 
+    badgeClass = "b3A"; 
+  }
+  else if(person.level !== "Diplômé") {
+    badgeClass = levelBadgeClass(person.level);
+  }
+
   if(person.level !== "Diplômé"){
-    const n = parseInt(person.level,10);
-    info = { label: person.level, badgeClass: levelBadgeClass(person.level), promo: n };
+    if(n >= 4 && n <= 20) badgeClass = "b" + n + "A";
+    else if(n > 20) badgeClass = "b20A";
+    const info = { label, badgeClass, promo: n };
+    _levelCache.set(person.id, info);
+    return info;
   } else {
     const kids = childrenOf(person.id);
     if(kids.length === 0){
-      info = { label: "Diplômé", badgeClass: "bDiplome", promo: 5 };
+      const computedN = Math.max(3, n);
+      let computedBadge = "bAlumni";
+      if(computedN >= 4 && computedN <= 20) computedBadge = "b" + computedN + "A";
+      else if(computedN > 20) computedBadge = "b20A";
+      const info = { 
+        label: computedN + "A", 
+        badgeClass: computedBadge, 
+        promo: computedN 
+      };
+      _levelCache.set(person.id, info);
+      return info;
     } else {
       let maxPromo = 0;
       kids.forEach(k => {
         const kInfo = effectiveLevelInfo(k);
         if(kInfo.promo > maxPromo) maxPromo = kInfo.promo;
       });
-      const N = Math.max(6, maxPromo + 1);
-      info = {
+      const N = Math.max(n, maxPromo + 1);
+      let computedBadge = "bAlumni";
+      if(N >= 4 && N <= 20) computedBadge = "b" + N + "A";
+      else if(N > 20) computedBadge = "b20A";
+      const info = {
         label: N + "A",
-        badgeClass: N <= 5 ? "b" + N + "A" : "bAlumni",
+        badgeClass: computedBadge,
         promo: N
       };
+      _levelCache.set(person.id, info);
+      return info;
     }
   }
-  _levelCache.set(person.id, info);
-  return info;
 }
 
 function nameTaken(prenom, nom, excludeId){
-  const p1 = prenom.trim().toLowerCase(), n1 = nom.trim().toLowerCase();
+  const p1 = formatName(prenom).toLowerCase(), n1 = formatName(nom).toLowerCase();
   return people.some(p => p.id !== excludeId &&
     p.status !== "rejected" &&
-    p.prenom.trim().toLowerCase() === p1 &&
-    p.nom.trim().toLowerCase() === n1);
+    formatName(p.prenom).toLowerCase() === p1 &&
+    formatName(p.nom).toLowerCase() === n1);
 }
 function placeholderMatches(prenom, nom){
-  const p1 = prenom.trim().toLowerCase(), n1 = nom.trim().toLowerCase();
+  const p1 = formatName(prenom).toLowerCase(), n1 = formatName(nom).toLowerCase();
   if(!p1 || !n1) return [];
   return placeholderPeople().filter(ph =>
-    ph.prenom.trim().toLowerCase() === p1 && ph.nom.trim().toLowerCase() === n1);
+    formatName(ph.prenom).toLowerCase() === p1 && formatName(ph.nom).toLowerCase() === n1);
 }
 function existingRealMatches(prenom, nom, excludeId){
-  const p1 = prenom.trim().toLowerCase(), n1 = nom.trim().toLowerCase();
+  const p1 = formatName(prenom).toLowerCase(), n1 = formatName(nom).toLowerCase();
   if(!p1 || !n1) return [];
   return people.filter(p => p.id !== excludeId &&
     (p.status === "approved" || p.status === "pending") &&
-    p.prenom.trim().toLowerCase() === p1 && p.nom.trim().toLowerCase() === n1);
+    formatName(p.prenom).toLowerCase() === p1 && formatName(p.nom).toLowerCase() === n1);
 }
 
 /* =========================================================================
@@ -536,7 +734,6 @@ function render(){
   renderTabs();
   const view = $("#view");
   
-  // Filtre de confidentialité : Empêcher l'accès à l'annuaire si non connecté
   if(currentTab === "annuaire" && !authUser){
     view.innerHTML = `<div class="panel" style="max-width: 460px; margin: 40px auto; text-align: center;">
       <h3 style="margin-bottom: 12px;">Accès restreint</h3>
@@ -597,7 +794,7 @@ function renderAuth(){
    ========================================================================= */
 const TREE_NODE_W = 178, TREE_NODE_H = 60, TREE_GAP_X = 18, TREE_LEVEL_H = 104,
       TREE_PAD_X = 24, TREE_PAD_TOP = 20, TREE_FAMILY_GAP = 50, TREE_STEM = 20,
-      TREE_ROW_GUTTER_W = 56;
+      TREE_ROW_GUTTER_W = 75;
 
 function buildTreeWrapper(person, depth, pathIds){
   pathIds = pathIds || new Set();
@@ -864,12 +1061,13 @@ function renderPromoRows(maxPromo, totalWidth){
   let out = "";
   for(let i=1; i<=maxPromo; i++){
     const y = TREE_PAD_TOP + (maxPromo - i) * TREE_LEVEL_H;
-    const cls = i <= 5 ? "b" + i + "A" : "bAlumni";
+    let cls = "bAlumni";
+    if(i >= 1 && i <= 20) cls = "b" + i + "A";
     const label = i + "A";
     out += `<line x1="0" y1="${y - 10}" x2="${totalWidth}" y2="${y - 10}" class="tree-row-divider" />`;
     out += `<foreignObject x="0" y="${y}" width="${TREE_ROW_GUTTER_W - 8}" height="${TREE_NODE_H}">
       <div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:center;height:100%;">
-        <span class="badge ${cls}" style="opacity:.9;">${esc(label)}</span>
+        <span class="badge ${cls}" style="opacity:.9; font-size:11px;">${esc(label)}</span>
       </div>
     </foreignObject>`;
   }
@@ -877,11 +1075,13 @@ function renderPromoRows(maxPromo, totalWidth){
 }
 
 function renderArbre(){
-  const legendLabels = ["1A","2A","3A","4A","5A","6A","7A","8A","9A","10A+"];
+  const legendLabels = ["1A", "2A", "3A", "4A", "5A", "6A", "7A", "8A", "9A", "10A", "15A", "20A"];
   const legend = `
     <div class="tree-legend">
       ${legendLabels.map(l=>{
-        const cls = l==="6A" || l==="7A+" ? "bAlumni" : levelBadgeClass(l);
+        const num = parseInt(l, 10);
+        let cls = "bAlumni";
+        if(num >= 1 && num <= 20) cls = "b" + l;
         return `<span><span class="badge ${cls}">${l}</span></span>`;
       }).join("")}
       <span>Contour pointillé = filleul non inscrit</span>
@@ -937,14 +1137,14 @@ function renderArbre(){
   </div>`;
 
   return `<div class="panel">
-    <p class="intro">Chaque branche part d'un membre fondateur (sans parrain) et descend vers ses filleuls. Les plus anciens sont en haut, les 1A tout en bas. Les lignes horizontales correspondent aux promos (1A, 2A, 3A…) : tout le monde de la même année est aligné sur la même ligne, quelle que soit sa branche de parrainage. Quand un Diplômé a des filleuls, sa promo « visible » monte à 6A, 7A, etc. — et remonte donc plus haut dans l'arbre. Une personne avec plusieurs parrains n'a qu'une seule case, reliée à chacun de ses parrains. Clique sur une carte pour voir le profil, sur ▾ pour replier une branche, ou utilise la recherche pour retrouver quelqu'un.</p>
+    <p class="intro">Chaque branche part d'un membre fondateur (sans parrain) et descend vers ses filleuls. Les plus anciens sont en haut, les 1A tout en bas. Les lignes horizontales correspondent aux promos (1A, 2A, 3A…) : tout le monde de la même année est aligné sur la même ligne, quelle que soit sa branche de parrainage. Une personne avec plusieurs parrains n'a qu'une seule case, reliée à chacun de ses parrains. Clique sur une carte pour voir le profil, sur ▾ pour replier une branche, ou utilise la recherche pour retrouver quelqu'un.</p>
     ${controls}
     ${legend}
     <div class="tree-svg-wrap" id="tree-svg-wrap">
       <svg width="${zw}" height="${zh}" viewBox="0 0 ${totalWidth} ${totalHeight}" preserveAspectRatio="xMinYMin meet">
         <defs>
           <marker id="arrow-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-            <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--ink-2)" />
           </marker>
           <marker id="arrow-extra" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
             <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--amber)" />
@@ -960,13 +1160,15 @@ function renderArbre(){
 }
 
 function findOrCreatePlaceholder(prenom, nom, level = "1A", sourceId = null){
-  const p1 = prenom.trim().toLowerCase();
-  const n1 = nom.trim().toLowerCase();
+  const formattedPrenom = formatName(prenom);
+  const formattedNom = formatName(nom);
+  const p1 = formattedPrenom.toLowerCase();
+  const n1 = formattedNom.toLowerCase();
 
   let existing = people.find(p =>
     (p.status === "placeholder" || p.status === "placeholder_pending") &&
-    p.prenom.trim().toLowerCase() === p1 &&
-    p.nom.trim().toLowerCase() === n1
+    formatName(p.prenom).toLowerCase() === p1 &&
+    formatName(p.nom).toLowerCase() === n1
   );
 
   if(existing){
@@ -979,8 +1181,8 @@ function findOrCreatePlaceholder(prenom, nom, level = "1A", sourceId = null){
 
   const placeholder = {
     id: uid(),
-    prenom: prenom.trim(),
-    nom: nom.trim(),
+    prenom: formattedPrenom,
+    nom: formattedNom,
     level,
     anneeDiplome: "",
     parrainIds: [],
@@ -1018,18 +1220,20 @@ function cleanupPlaceholdersForRejected(rejectedId){
 }
 
 function attachFilleul(prenom, nom, level, parrainId, sourceId){
-  const p1 = prenom.trim().toLowerCase(), n1 = nom.trim().toLowerCase();
+  const formattedPrenom = formatName(prenom);
+  const formattedNom = formatName(nom);
+  const p1 = formattedPrenom.toLowerCase(), n1 = formattedNom.toLowerCase();
   if(!p1 || !n1 || !parrainId) return null;
 
   const existing = people.find(p => p.status !== "rejected" &&
-    p.prenom.trim().toLowerCase() === p1 && p.nom.trim().toLowerCase() === n1);
+    formatName(p.prenom).toLowerCase() === p1 && formatName(p.nom).toLowerCase() === n1);
 
   if(existing){
     addParrainId(existing, parrainId);
     return existing;
   }
 
-  const placeholder = findOrCreatePlaceholder(prenom, nom, level, sourceId);
+  const placeholder = findOrCreatePlaceholder(formattedPrenom, formattedNom, level, sourceId);
   addParrainId(placeholder, parrainId);
   return placeholder;
 }
@@ -1060,7 +1264,7 @@ function renderAnnuaire(){
       <input type="text" id="dir-search" placeholder="Nom, entreprise, BDE, filière…" value="${esc(dirQuery)}">
       <select id="dir-level">
         <option value="">Toutes promos</option>
-        ${LEVELS.map(l=>`<option value="${l}" ${dirLevel===l?'selected':''}>${l}</option>`).join("")}
+        ${ALL_LEVELS.map(l=>`<option value="${l}" ${dirLevel===l?'selected':''}>${l}</option>`).join("")}
       </select>
       <select id="dir-filiere">
         <option value="">Toutes filières</option>
@@ -1153,6 +1357,17 @@ function renderRejoindre(){
   }
 
   const f = joinForm;
+  
+  const isMasterFiliere = f.filiere === "PME-PMI" || f.filiere === "Éco-stat";
+  const isActuariat = f.filiere === "Actuariat";
+  
+  let availableLevels = ["1A","2A","3A","Diplômé"];
+  if (isMasterFiliere) {
+    availableLevels = ["M1", "M2", "Diplômé"];
+  } else if (isActuariat) {
+    availableLevels = ["1A", "2A", "3A", "Diplômé"];
+  }
+  
   const approved = approvedPeople();
   const matches = f.parrainSearch.trim().length>0
     ? approved.filter(p => fullName(p).toLowerCase().includes(f.parrainSearch.trim().toLowerCase())).slice(0,8)
@@ -1188,21 +1403,23 @@ function renderRejoindre(){
         </div>
         <div class="row2">
           <div class="field">
-            <label>Promo actuelle *</label>
-            <select name="level">${LEVELS.map(l=>`<option value="${l}" ${f.level===l?'selected':''}>${l}</option>`).join("")}</select>
+            <label>Filière *</label>
+            <select name="filiere" id="form-filiere">
+              <option value="" ${!f.filiere?'selected':''}>— Pas encore choisie —</option>
+              ${FILIERES.map(fi=>`<option value="${fi}" ${f.filiere===fi?'selected':''}>${fi}</option>`).join("")}
+            </select>
           </div>
           <div class="field">
-            <label>Année de diplôme (obtenue ou prévue) *</label>
-            <input type="number" name="anneeDiplome" min="1980" max="2035" value="${esc(f.anneeDiplome)}" placeholder="ex : 2027">
-            ${f.errors.anneeDiplome?`<div class="error-text">${f.errors.anneeDiplome}</div>`:""}
+            <label>Niveau / Promo actuelle *</label>
+            <select name="level" id="form-level" ${!f.filiere ? 'disabled title="Veuillez d\'abord choisir une filière"' : ''}>
+              ${!f.filiere ? '<option value="">— Choisis d\'abord une filière —</option>' : availableLevels.map(l=>`<option value="${l}" ${f.level===l?'selected':''}>${l}</option>`).join("")}
+            </select>
           </div>
         </div>
-        <div class="field">
-          <label>Filière</label>
-          <select name="filiere">
-            <option value="" ${!f.filiere?'selected':''}>— Pas encore choisie —</option>
-            ${FILIERES.map(fi=>`<option value="${fi}" ${f.filiere===fi?'selected':''}>${fi}</option>`).join("")}
-          </select>
+        <div class="field" style="max-width: 50%;">
+          <label>Année de diplôme (obtenue ou prévue) *</label>
+          <input type="number" name="anneeDiplome" min="1980" max="2035" value="${esc(f.anneeDiplome)}" placeholder="ex : 2026">
+          ${f.errors.anneeDiplome?`<div class="error-text">${f.errors.anneeDiplome}</div>`:""}
         </div>
       </div>
 
@@ -1265,7 +1482,7 @@ function renderRejoindre(){
               <div class="field">
                 <label>Niveau du futur parrain</label>
                 <select id="futur-parrain-level">
-                  ${LEVELS.map(l => `<option value="${l}" ${f.parrainNonInscrit.level===l?'selected':''}>${l}</option>`).join("")}
+                  ${ALL_LEVELS.map(l => `<option value="${l}" ${f.parrainNonInscrit.level===l?'selected':''}>${l}</option>`).join("")}
                 </select>
               </div>
 
@@ -1312,7 +1529,7 @@ function renderRejoindre(){
             <div class="filleul-row">
               <input type="text" placeholder="Prénom" data-fl="prenom" data-i="${i}" value="${esc(x.prenom)}">
               <input type="text" placeholder="Nom" data-fl="nom" data-i="${i}" value="${esc(x.nom)}">
-              <select data-fl="level" data-i="${i}">${LEVELS.map(l=>`<option value="${l}" ${x.level===l?'selected':''}>${l}</option>`).join("")}</select>
+              <select data-fl="level" data-i="${i}">${ALL_LEVELS.map(l=>`<option value="${l}" ${x.level===l?'selected':''}>${l}</option>`).join("")}</select>
               <button type="button" class="btn secondary small" data-remove-fl="${i}">✕</button>
             </div>
           `).join("")}
@@ -1370,7 +1587,7 @@ function renderAdmin(){
   const pend = pendingPeople();
   const ph = placeholderPeople();
   const app = approvedPeople();
-  const stats = LEVELS.map(l => ({l, n: app.filter(p=>p.level===l).length}));
+  const stats = ALL_LEVELS.map(l => ({l, n: app.filter(p=>p.level===l).length}));
 
   return `<div class="panel">
     <div class="section-title">
@@ -1386,7 +1603,7 @@ function renderAdmin(){
 
   <div class="panel">
     <h3 style="margin-bottom:16px;">Demandes en attente (${pend.length})</h3>
-    ${pend.length===0 ? `<div class="empty">Aucune demande en attente.</div>` : pend.map(p=>renderAdminPendingItem(p)).join("")}
+    ${pend.length===0 ? `<div class="empty">Aucun.</div>` : pend.map(p=>renderAdminPendingItem(p)).join("")}
   </div>
 
   <div class="panel">
@@ -1460,7 +1677,7 @@ function renderAdminEditModal(){
         <div class="field"><label>Nom</label><input type="text" id="edit-nom" value="${esc(p.nom)}"></div>
       </div>
       <div class="row2">
-        <div class="field"><label>Promo</label><select id="edit-level">${LEVELS.map(l=>`<option ${p.level===l?'selected':''}>${l}</option>`).join("")}</select></div>
+        <div class="field"><label>Promo</label><select id="edit-level">${ALL_LEVELS.map(l=>`<option ${p.level===l?'selected':''}>${l}</option>`).join("")}</select></div>
         <div class="field"><label>Année diplôme</label><input type="number" id="edit-annee" value="${esc(p.anneeDiplome)}"></div>
       </div>
       <div class="field">
@@ -1486,7 +1703,6 @@ function renderAdminEditModal(){
    MODAL — profil
    ========================================================================= */
 function openProfileModal(id){
-  // Filtre de confidentialité : Empêcher l'affichage de la modale si non connecté
   if(!authUser){
     const root = $("#modal-root");
     root.innerHTML = `
@@ -1600,7 +1816,6 @@ function attachViewListeners(){
     el.addEventListener("click", (e)=>{ e.preventDefault(); currentTab = el.dataset.goto; render(); });
   });
 
-  // Gestion des liens internes de redirection (ex: boutons de connexion depuis les pages protégées)
   $$("[data-tab-link]").forEach(el=>{
     el.addEventListener("click", (e)=>{
       e.preventDefault();
@@ -1729,6 +1944,22 @@ function attachJoinListeners(){
   $("[name=nom]")?.addEventListener("blur", recheckNames);
   $("[name=prenom]")?.addEventListener("input", ()=>{ f.claimDismissed = false; });
   $("[name=nom]")?.addEventListener("input", ()=>{ f.claimDismissed = false; });
+  
+  $("[name=filiere]")?.addEventListener("change", ()=>{ 
+    syncFormFields(); 
+    const isMaster = f.filiere === "PME-PMI" || f.filiere === "Éco-stat";
+    const isActu = f.filiere === "Actuariat";
+    let available = ["1A","2A","3A","Diplômé"];
+    if(isMaster) available = ["M1", "M2", "Diplômé"];
+    else if(isActu) available = ["1A", "2A", "3A", "Diplômé"];
+    
+    if(f.filiere) {
+      f.level = available[0];
+    } else {
+      f.level = "";
+    }
+    render(); 
+  });
 
   $$("[data-claim-placeholder]").forEach(el=>{
     el.addEventListener("click", ()=>{
@@ -1780,10 +2011,13 @@ function attachJoinListeners(){
     const claimTarget = f.claimId ? findPerson(f.claimId) : null;
     const existingRecord = findPerson(authUser.uid);
 
+    const formattedPrenom = formatName(f.prenom);
+    const formattedNom = formatName(f.nom);
+
     if(claimTarget && (claimTarget.status === "placeholder" || claimTarget.status === "placeholder_pending")){
       claimTarget.id = authUser.uid; 
-      claimTarget.prenom = f.prenom.trim();
-      claimTarget.nom = f.nom.trim();
+      claimTarget.prenom = formattedPrenom;
+      claimTarget.nom = formattedNom;
       claimTarget.level = f.level;
       claimTarget.anneeDiplome = parseInt(f.anneeDiplome,10);
       claimTarget.filiere = FILIERES.includes(f.filiere) ? f.filiere : "";
@@ -1794,8 +2028,8 @@ function attachJoinListeners(){
       claimTarget.submittedAt = new Date().toISOString();
       person = claimTarget;
     } else if(existingRecord){
-      existingRecord.prenom = f.prenom.trim();
-      existingRecord.nom = f.nom.trim();
+      existingRecord.prenom = formattedPrenom;
+      existingRecord.nom = formattedNom;
       existingRecord.level = f.level;
       existingRecord.anneeDiplome = parseInt(f.anneeDiplome,10);
       existingRecord.filiere = FILIERES.includes(f.filiere) ? f.filiere : "";
@@ -1836,8 +2070,8 @@ function attachJoinListeners(){
 
       person = {
         id: newId,
-        prenom: f.prenom.trim(),
-        nom: f.nom.trim(),
+        prenom: formattedPrenom,
+        nom: formattedNom,
         level: f.level,
         anneeDiplome: parseInt(f.anneeDiplome,10),
         filiere: FILIERES.includes(f.filiere) ? f.filiere : "",
@@ -1990,8 +2224,8 @@ function attachAdminListeners(){
   $("#save-edit")?.addEventListener("click", async ()=>{
     const p = findPerson(editingId);
     if(!p) return;
-    p.prenom = $("#edit-prenom").value.trim();
-    p.nom = $("#edit-nom").value.trim();
+    p.prenom = formatName($("#edit-prenom").value);
+    p.nom = formatName($("#edit-nom").value);
     p.level = $("#edit-level").value;
     p.anneeDiplome = $("#edit-annee").value;
     const editedFiliere = $("#edit-filiere")?.value || "";
