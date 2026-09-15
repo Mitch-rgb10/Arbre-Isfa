@@ -28,7 +28,7 @@
   html[data-theme="light"] {
     --ink:#0f172a;
     --ink-2:#475569;
-    --paper:#f1f5f9;
+    --paper:#f8fafc;
     --paper-2:#e2e8f0;
     --line:#cbd5e1;
     --white:#ffffff;
@@ -41,7 +41,6 @@
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   
-  /* Scrollbars personnalisées au thème du site */
   * {
     scrollbar-width: thin;
     scrollbar-color: var(--line) var(--paper);
@@ -80,9 +79,10 @@
   a{color:var(--amber-dark);text-decoration:none;}
   a:hover{text-decoration:underline;}
   button{font-family:inherit;cursor:pointer;}
-  input,select,textarea{font-family:inherit;font-size:14px;}
+  input,select,textarea{font-family:inherit;font-size:14px;background:var(--white);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius);}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(59,130,246,0.15);}
 
-  #app{width:100%;margin:0;padding:0 30px 40px;}
+  #app{width:100%;margin:0;padding:0 20px 40px;}
 
   .topbar{
     display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
@@ -93,15 +93,14 @@
   }
   .brand{display:flex;align-items:center;gap:14px;}
   
-  /* Gestion du logo selon le thème */
   .brand-mark{
     height:44px;
     display:flex;align-items:center;justify-content:center;
     flex-shrink:0;
-    filter: brightness(0) invert(1); /* Blanc pour thème sombre */
+    filter: brightness(0) invert(1);
   }
   html[data-theme="light"] .brand-mark {
-    filter: none; /* Noir original pour thème clair */
+    filter: none;
   }
   .brand-mark img{
     height:100%;
@@ -111,13 +110,14 @@
   .brand h1{font-size:22px;letter-spacing:-0.01em;}
   .brand p{margin:2px 0 0;font-size:13px;color:var(--ink-2);}
 
-  .tabs{display:flex;gap:22px;padding-bottom:14px;}
+  .tabs{display:flex;gap:22px;padding-bottom:14px;overflow-x:auto;}
   .tab{
     background:none;border:none;padding:6px 0;
     font-size:14px;color:var(--ink-2);
     border-bottom:2px solid transparent;
     transition:color .15s;
     font-weight:500;
+    white-space:nowrap;
   }
   .tab:hover{color:var(--ink);}
   .tab.active{color:var(--ink);border-bottom-color:var(--ink);font-weight:600;}
@@ -135,6 +135,11 @@
     box-shadow: 0 4px 15px -5px rgba(0, 0, 0, 0.05);
   }
 
+  .full-section{
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
   .intro{font-size:13.5px;color:var(--ink-2);margin:0 0 18px;}
   .intro strong{color:var(--ink);}
 
@@ -145,28 +150,27 @@
     background:var(--paper-2);color:var(--ink);
     border:1px solid var(--line);
   }
-  /* Dégradé progressif de couleurs pour les étiquettes de 1A à 20A */
-  .badge.b1A{background:#0c4a6e;color:#38bdf8;border-color:#0369a1;}
-  .badge.b2A{background:#064e3b;color:#4ade80;border-color:#047857;}
-  .badge.b3A{background:#581c87;color:#c084fc;border-color:#7e22ce;}
-  .badge.b4A{background:#7c2d12;color:#fb923c;border-color:#c2410c;}
-  .badge.b5A{background:#831843;color:#f472b6;border-color:#be185d;}
-  .badge.b6A{background:#4c1d95;color:#ddd6fe;border-color:#6d28d9;}
-  .badge.b7A{background:#1e3a8a;color:#93c5fd;border-color:#2563eb;}
-  .badge.b8A{background:#134e4a;color:#5eead4;border-color:#0f766e;}
-  .badge.b9A{background:#065f46;color:#6ee7b7;border-color:#059669;}
-  .badge.b10A{background:#365314;color:#bef264;border-color:#4d7c0f;}
-  .badge.b11A{background:#713f12;color:#fde047;border-color:#a16207;}
-  .badge.b12A{background:#78350f;color:#fdba74;border-color:#b45309;}
-  .badge.b13A{background:#7c2d12;color:#fca5a5;border-color:#ea580c;}
-  .badge.b14A{background:#881337;color:#fda4af;border-color:#e11d48;}
-  .badge.b15A{background:#701a75;color:#f0abfc;border-color:#a21caf;}
-  .badge.b16A{background:#581c87;color:#e9d5ff;border-color:#7e22ce;}
-  .badge.b17A{background:#312e81;color:#c7d2fe;border-color:#4338ca;}
-  .badge.b18A{background:#1e3a8a;color:#bfdbfe;border-color:#1d4ed8;}
-  .badge.b19A{background:#0f172a;color:#cbd5e1;border-color:#334155;}
-  .badge.b20A{background:#020617;color:#f8fafc;border-color:#475569;}
-  .badge.bAlumni{background:#1e293b;color:#cbd5e1;border-color:#334155;}
+  .badge.b1A{background:#0284c7;color:#ffffff;border-color:#38bdf8;}
+  .badge.b2A{background:#059669;color:#ffffff;border-color:#34d399;}
+  .badge.b3A{background:#7c3aed;color:#ffffff;border-color:#a78bfa;}
+  .badge.b4A{background:#ea580c;color:#ffffff;border-color:#fb923c;}
+  .badge.b5A{background:#db2777;color:#ffffff;border-color:#f472b6;}
+  .badge.b6A{background:#4f46e5;color:#ffffff;border-color:#818cf8;}
+  .badge.b7A{background:#2563eb;color:#ffffff;border-color:#60a5fa;}
+  .badge.b8A{background:#0d9488;color:#ffffff;border-color:#2dd4bf;}
+  .badge.b9A{background:#16a34a;color:#ffffff;border-color:#4ade80;}
+  .badge.b10A{background:#65a30d;color:#ffffff;border-color:#a3e635;}
+  .badge.b11A{background:#ca8a04;color:#ffffff;border-color:#facc15;}
+  .badge.b12A{background:#d97706;color:#ffffff;border-color:#fbbf24;}
+  .badge.b13A{background:#c2410c;color:#ffffff;border-color:#fb923c;}
+  .badge.b14A{background:#e11d48;color:#ffffff;border-color:#fb7185;}
+  .badge.b15A{background:#9333ea;color:#ffffff;border-color:#c084fc;}
+  .badge.b16A{background:#6d28d9;color:#ffffff;border-color:#a78bfa;}
+  .badge.b17A{background:#4338ca;color:#ffffff;border-color:#818cf8;}
+  .badge.b18A{background:#1d4ed8;color:#ffffff;border-color:#60a5fa;}
+  .badge.b19A{background:#334155;color:#ffffff;border-color:#94a3b8;}
+  .badge.b20A{background:#0f172a;color:#ffffff;border-color:#cbd5e1;}
+  .badge.bAlumni{background:#334155;color:#f8fafc;border-color:#64748b;}
 
   .pill{
     display:inline-flex;align-items:center;gap:5px;
@@ -175,6 +179,7 @@
   .pill.pending{background:var(--rust-bg);color:var(--rust);}
   .pill.approved{background:var(--green-bg);color:var(--green);}
   .pill.placeholder{background:var(--paper-2);color:var(--ink-2);border:1px dashed var(--line);}
+  .pill.info{background:rgba(59,130,246,0.15);color:var(--amber-dark);}
 
   .tree-controls{
     display:flex;flex-wrap:wrap;gap:10px;align-items:center;
@@ -182,12 +187,12 @@
   }
   .tree-controls input[type=text]{
     flex:1;min-width:200px;padding:9px 11px;
-    border:1px solid var(--line);border-radius:var(--radius);background:var(--paper);color:var(--ink);
+    border:1px solid var(--line);border-radius:var(--radius);background:var(--white);color:var(--ink);
   }
   .tree-zoom{
     display:inline-flex;align-items:center;gap:4px;
     border:1px solid var(--line);border-radius:var(--radius);
-    padding:2px 4px;background:var(--paper);
+    padding:2px 4px;background:var(--white);
   }
   .tree-zoom .btn{padding:4px 10px;}
   .tree-zoom-value{font-size:12.5px;color:var(--ink-2);min-width:44px;text-align:center;}
@@ -197,10 +202,14 @@
   .tree-legend span{display:inline-flex;align-items:center;gap:6px;}
   .tree-svg-wrap{
     overflow:auto;border:1px solid var(--line);border-radius:var(--radius);
-    background:var(--paper);padding:14px;
-    max-height:75vh;
+    background:var(--white);padding:14px;
+    max-height:78vh;
     position:relative;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y pinch-zoom;
   }
+  html[data-theme="light"] .tree-svg-wrap { box-shadow: 0 4px 15px -5px rgba(0, 0, 0, 0.05); }
   
   .tree-link{stroke:var(--ink-2);stroke-width:2;fill:none;} 
   .tree-link.dim{stroke:var(--line);opacity:0.5;}
@@ -243,38 +252,35 @@
 
   .dir-controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;}
   .dir-controls input, .dir-controls select{
-    padding:9px 11px;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper);color:var(--ink);
+    padding:9px 11px;border:1px solid var(--line);border-radius:var(--radius);background:var(--white);color:var(--ink);
   }
   .dir-controls input{flex:1;min-width:180px;}
   .dir-row{
     display:flex;align-items:center;justify-content:space-between;gap:12px;
-    padding:12px 10px;border-bottom:1px solid var(--line);cursor:pointer;
-    transition:background 0.1s;
+    padding:14px 16px;background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
+    margin-bottom:10px;cursor:pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition:transform 0.1s, box-shadow 0.1s, border-color 0.1s;
   }
-  .dir-row:hover{background:var(--paper-2);border-radius:6px;}
-  .dir-row:last-child{border-bottom:none;}
+  html[data-theme="light"] .dir-row { box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .dir-row:hover{transform: translateY(-1px); border-color:var(--amber); box-shadow: 0 4px 12px rgba(0,0,0,0.25);}
   .dir-left{display:flex;align-items:center;gap:12px;}
   .dir-name{font-weight:600;color:var(--ink);}
   .dir-sub{font-size:12.5px;color:var(--ink-2);}
 
   .form-section{margin-bottom:22px;}
   .form-section h3{font-size:15px;margin-bottom:4px;}
-  .form-section .hint{font-size:12.5px;color:var(--ink-2);margin:0 0 12px;}
+  .form-section .hint{font-size:13px;color:var(--ink-2);margin:0 0 12px;line-height:1.5;}
   .field{margin-bottom:14px;}
   .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:5px;}
   .field input[type=text], .field input[type=number], .field select, .field textarea, .field input[type=password], .field input[type=email]{
     width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:var(--radius);
-    background:var(--paper);color:var(--ink);
+    background:var(--white);color:var(--ink);
     transition:border-color 0.15s, box-shadow 0.15s;
   }
   .field input:disabled, .field select:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus{
-    outline:none;
-    border-color:var(--amber);
-    box-shadow:0 0 0 3px rgba(59,130,246,0.15);
   }
   .field textarea{resize:vertical;min-height:60px;}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
@@ -303,15 +309,10 @@
   }
   .exp-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
 
-  .search-picker{border:1px solid var(--line);border-radius:var(--radius);max-height:180px;overflow-y:auto;margin-top:6px;background:var(--paper);}
-  .search-picker-item{padding:8px 11px;font-size:13.5px;cursor:pointer;border-bottom:1px solid var(--line);}
+  .search-picker{border:1px solid var(--line);border-radius:var(--radius);max-height:180px;overflow-y:auto;margin-top:6px;background:var(--white);}
+  .search-picker-item{padding:8px 11px;font-size:13.5px;cursor:pointer;border-bottom:1px solid var(--line);color:var(--ink);}
   .search-picker-item:last-child{border-bottom:none;}
   .search-picker-item:hover{background:var(--paper-2);}
-  .parrain-chosen{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:9px 12px;border:1px solid #1e40af;background:rgba(30,64,175,0.2);border-radius:var(--radius);font-size:13.5px;
-  }
-  html[data-theme="light"] .parrain-chosen { background:rgba(37,99,235,0.1); border-color:#93c5fd;}
 
   .warning-box{
     border:1px solid rgba(239,68,68,0.3);background:var(--rust-bg);color:#fca5a5;
@@ -326,8 +327,23 @@
   .error-text{color:#fca5a5;font-size:12px;margin-top:4px;font-weight:500;}
   html[data-theme="light"] .error-text { color: #dc2626; }
 
-  .filleul-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
-  .filleul-row input{flex:1;}
+  .selected-tags-container{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:6px;background:var(--paper-2);border:1px solid var(--line);padding:4px 10px;border-radius:6px;font-size:13px;color:var(--ink);}
+  .tag-remove{background:none;border:none;color:var(--ink-2);cursor:pointer;font-size:14px;padding:0;display:flex;align-items:center;}
+  .tag-remove:hover{color:var(--rust);}
+
+  .subform-box {
+    margin-top:12px;
+    padding:16px;
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  html[data-theme="light"] .subform-box {
+    background:var(--white);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  }
 
   #modal-root{position:fixed;inset:0;z-index:50;display:none;}
   #modal-root.open{display:block;}
@@ -358,7 +374,6 @@
   .admin-actions{display:flex;gap:8px;margin-top:10px;}
   .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 
-  /* Sélecteur de thème en bas à droite */
   .theme-switcher {
     display: flex;
     justify-content: flex-end;
@@ -431,9 +446,6 @@ const SUBMIT_MIN_INTERVAL_MS = 10 * 1000;
 const MAX_EXPERIENCES = 20;
 const MAX_FILLEULS_DECLARES = 30;
 
-/* =========================================================================
-   GESTION DU THÈME (Sombre / Clair)
-   ========================================================================= */
 const htmlEl = document.documentElement;
 const savedTheme = localStorage.getItem("isfa-theme") || "dark";
 setTheme(savedTheme);
@@ -475,9 +487,6 @@ const EXP_TYPES = ["Stage","Alternance","CDI","CDD","Autre"];
 const NAME_RE = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,40}$/;
 const VALID_STATUSES = ["approved","pending","placeholder","placeholder_pending","rejected"];
 
-/* =========================================================================
-   STATE
-   ========================================================================= */
 let people = [];
 let currentTab = "arbre";
 let authUser = null;
@@ -489,9 +498,11 @@ let joinForm = null;
 let editingId = null; 
 let collapsedIds = new Set(); 
 let treeSearch = "";
-let treeZoom = 1;
+let treeZoom = 0.85; 
 let _levelCache = new Map(); 
 let lastSubmitAt = 0;
+
+let adminNewPerson = { prenom: "", nom: "", filiere: "", level: "1A", anneeDiplome: "", parrainId: "" };
 
 const $ = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
@@ -500,7 +511,6 @@ function esc(str){
 }
 function uid(){ return 'p_' + Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
 
-/* Fonction pour formater automatiquement les prénoms et noms */
 function formatName(str){
   if(!str) return "";
   return str.trim().toLowerCase().replace(/(^|[ \-])([a-zà-öø-ÿ])/g, (match, sep, char) => sep + char.toUpperCase());
@@ -518,9 +528,6 @@ function isValidPersonRecord(p){
     && (p.pendingSourceIds === undefined || Array.isArray(p.pendingSourceIds));
 }
 
-/* =========================================================================
-   STORAGE
-   ========================================================================= */
 async function loadPeople(){
   try{
     const snap = await peopleCol.get();
@@ -556,9 +563,6 @@ async function savePeople(){
   }
 }
 
-/* =========================================================================
-   HELPERS & CALCUL DE PROMO (Année de diplôme / Niveau)
-   ========================================================================= */
 function levelBadgeClass(level){
   if(level === "Diplômé" || level === "M2") return "bDiplome";
   return "b" + level;
@@ -700,9 +704,6 @@ function existingRealMatches(prenom, nom, excludeId){
     formatName(p.prenom).toLowerCase() === p1 && formatName(p.nom).toLowerCase() === n1);
 }
 
-/* =========================================================================
-   RENDER — SHELL
-   ========================================================================= */
 function renderTabs(){
   const tabs = [
     ["arbre","Arbre"],
@@ -754,9 +755,6 @@ function render(){
   attachViewListeners();
 }
 
-/* =========================================================================
-   AUTH — Connexion / Inscription
-   ========================================================================= */
 function renderAuth(){
   return `<div class="panel" style="max-width: 420px; margin: 40px auto;">
     <h3 style="margin-bottom: 8px;">Espace Membre</h3>
@@ -789,9 +787,6 @@ function renderAuth(){
   </div>`;
 }
 
-/* =========================================================================
-   ARBRE — diagramme SVG avec branches
-   ========================================================================= */
 const TREE_NODE_W = 178, TREE_NODE_H = 60, TREE_GAP_X = 18, TREE_LEVEL_H = 104,
       TREE_PAD_X = 24, TREE_PAD_TOP = 20, TREE_FAMILY_GAP = 50, TREE_STEM = 20,
       TREE_ROW_GUTTER_W = 75;
@@ -1084,12 +1079,12 @@ function renderArbre(){
         if(num >= 1 && num <= 20) cls = "b" + l;
         return `<span><span class="badge ${cls}">${l}</span></span>`;
       }).join("")}
-      <span>Contour pointillé = filleul non inscrit</span>
-      <span><span style="display:inline-block;width:18px;height:0;border-top:2px dashed var(--amber);"></span> Second parrain (même personne)</span>
+      <span>Contour pointillé = membre non inscrit</span>
+      <span><span style="display:inline-block;width:18px;height:0;border-top:2px dashed var(--amber);"></span> Second parrain</span>
     </div>`;
   if(roots().length === 0){
-    return `<div class="panel">
-      <p class="intro">Chaque branche part d'un membre fondateur (sans parrain) en haut et descend vers ses filleuls, des plus anciens (en haut) aux 1A (en bas).</p>
+    return `<div class="full-section">
+      <p class="intro">Visualisez les liens de parrainage et le réseau des familles de l'ISFA à travers les générations.</p>
       ${legend}
       <div class="empty">Aucune famille pour l'instant. Sois le premier à <a href="#" data-goto="rejoindre">rejoindre l'arbre</a>.</div>
     </div>`;
@@ -1124,24 +1119,24 @@ function renderArbre(){
   const zh = Math.round(totalHeight * treeZoom);
 
   const controls = `<div class="tree-controls">
-    <input type="text" id="tree-search" placeholder="Rechercher un nom, une promo, un BDE (ex : isfalcatraz)…" value="${esc(treeSearch)}">
+    <input type="text" id="tree-search" placeholder="Rechercher un nom, une promo, un BDE…" value="${esc(treeSearch)}">
     <button type="button" class="btn secondary small" id="tree-expand-all">Tout déplier</button>
     <button type="button" class="btn secondary small" id="tree-collapse-all">Tout replier</button>
     <div class="tree-zoom">
       <button type="button" class="btn secondary small" id="tree-zoom-out" title="Dézoomer">−</button>
-      <span class="tree-zoom-value">${Math.round(treeZoom*100)}%</span>
+      <span class="tree-zoom-value" id="zoom-val-label">${Math.round(treeZoom*100)}%</span>
       <button type="button" class="btn secondary small" id="tree-zoom-in" title="Zoomer">+</button>
-      <button type="button" class="btn secondary small" id="tree-zoom-reset" title="Réinitialiser">Reset</button>
+      <button type="button" class="btn secondary small" id="tree-zoom-reset" title="Réinitialiser le zoom">Vue globale</button>
     </div>
     <span class="tree-info">${allNodes.length} membre${allNodes.length>1?'s':''}${q?` · ${matchCount} correspondance${matchCount>1?'s':''}`:''}</span>
   </div>`;
 
-  return `<div class="panel">
-    <p class="intro">Chaque branche part d'un membre fondateur (sans parrain) et descend vers ses filleuls. Les plus anciens sont en haut, les 1A tout en bas. Les lignes horizontales correspondent aux promos (1A, 2A, 3A…) : tout le monde de la même année est aligné sur la même ligne, quelle que soit sa branche de parrainage. Une personne avec plusieurs parrains n'a qu'une seule case, reliée à chacun de ses parrains. Clique sur une carte pour voir le profil, sur ▾ pour replier une branche, ou utilise la recherche pour retrouver quelqu'un.</p>
+  return `<div class="full-section">
+    <p class="intro">Découvrez l'arbre généalogique des familles de l'ISFA : chaque branche relie parrains et filleuls à travers les promotions, de la 1A aux diplômés.</p>
     ${controls}
     ${legend}
     <div class="tree-svg-wrap" id="tree-svg-wrap">
-      <svg width="${zw}" height="${zh}" viewBox="0 0 ${totalWidth} ${totalHeight}" preserveAspectRatio="xMinYMin meet">
+      <svg id="tree-svg-element" width="${zw}" height="${zh}" viewBox="0 0 ${totalWidth} ${totalHeight}" preserveAspectRatio="xMinYMin meet">
         <defs>
           <marker id="arrow-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
             <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--ink-2)" />
@@ -1159,7 +1154,7 @@ function renderArbre(){
   </div>`;
 }
 
-function findOrCreatePlaceholder(prenom, nom, level = "1A", sourceId = null){
+function findOrCreatePlaceholder(prenom, nom, level = "1A", filiere = "", anneeDiplome = "", sourceId = null){
   const formattedPrenom = formatName(prenom);
   const formattedNom = formatName(nom);
   const p1 = formattedPrenom.toLowerCase();
@@ -1172,6 +1167,9 @@ function findOrCreatePlaceholder(prenom, nom, level = "1A", sourceId = null){
   );
 
   if(existing){
+    if(filiere) existing.filiere = filiere;
+    if(level) existing.level = level;
+    if(anneeDiplome) existing.anneeDiplome = parseInt(anneeDiplome, 10);
     if(existing.status === "placeholder_pending" && sourceId){
       if(!Array.isArray(existing.pendingSourceIds)) existing.pendingSourceIds = [];
       if(!existing.pendingSourceIds.includes(sourceId)) existing.pendingSourceIds.push(sourceId);
@@ -1184,7 +1182,8 @@ function findOrCreatePlaceholder(prenom, nom, level = "1A", sourceId = null){
     prenom: formattedPrenom,
     nom: formattedNom,
     level,
-    anneeDiplome: "",
+    filiere: FILIERES.includes(filiere) ? filiere : "",
+    anneeDiplome: anneeDiplome ? parseInt(anneeDiplome, 10) : "",
     parrainIds: [],
     bde: { membre:false, nom:"" },
     experiences: [],
@@ -1219,7 +1218,7 @@ function cleanupPlaceholdersForRejected(rejectedId){
   });
 }
 
-function attachFilleul(prenom, nom, level, parrainId, sourceId){
+function attachFilleul(prenom, nom, level, filiere, anneeDiplome, parrainId, sourceId){
   const formattedPrenom = formatName(prenom);
   const formattedNom = formatName(nom);
   const p1 = formattedPrenom.toLowerCase(), n1 = formattedNom.toLowerCase();
@@ -1229,18 +1228,18 @@ function attachFilleul(prenom, nom, level, parrainId, sourceId){
     formatName(p.prenom).toLowerCase() === p1 && formatName(p.nom).toLowerCase() === n1);
 
   if(existing){
+    if(filiere) existing.filiere = filiere;
+    if(level) existing.level = level;
+    if(anneeDiplome) existing.anneeDiplome = parseInt(anneeDiplome, 10);
     addParrainId(existing, parrainId);
     return existing;
   }
 
-  const placeholder = findOrCreatePlaceholder(formattedPrenom, formattedNom, level, sourceId);
+  const placeholder = findOrCreatePlaceholder(formattedPrenom, formattedNom, level, filiere, anneeDiplome, sourceId);
   addParrainId(placeholder, parrainId);
   return placeholder;
 }
 
-/* =========================================================================
-   ANNUAIRE
-   ========================================================================= */
 function renderAnnuaire(){
   const list = approvedPeople()
     .filter(p => {
@@ -1258,7 +1257,7 @@ function renderAnnuaire(){
     })
     .sort((a,b)=> fullName(a).localeCompare(fullName(b)));
 
-  return `<div class="panel">
+  return `<div class="full-section">
     <p class="intro">Recherche un ancien par nom, promo, BDE ou entreprise (les infos pro affichées ici sont uniquement celles que la personne a choisi de rendre visibles).</p>
     <div class="dir-controls">
       <input type="text" id="dir-search" placeholder="Nom, entreprise, BDE, filière…" value="${esc(dirQuery)}">
@@ -1294,23 +1293,20 @@ function renderAnnuaire(){
   </div>`;
 }
 
-/* =========================================================================
-   REJOINDRE / MON PROFIL
-   ========================================================================= */
 function blankJoinForm(){
   return {
     prenom:"", nom:"", level:"1A", anneeDiplome:"", filiere:"",
     parrainMode: "choisi", 
-    parrainId: "",
+    parrainIds: [],
+    parrainsNonInscrits: [],
     parrainSearch: "",
-    parrainNonInscrit: {
-      prenom: "",
-      nom: "",
-      level: "1A"
-    },
+    parrainNonInscritTmp: { prenom: "", nom: "", filiere: "", level: "1A", anneeDiplome: "" },
     bdeMembre:false, bdeNom:"",
     experiences: [],
     filleulsConnus: [], 
+    filleulsNonInscrits: [],
+    filleulSearch: "",
+    filleulNonInscritTmp: { prenom: "", nom: "", filiere: "", level: "1A", anneeDiplome: "" },
     claimId: null,        
     claimDismissed: false, 
     errors: {},
@@ -1319,8 +1315,7 @@ function blankJoinForm(){
 
 function initJoinFormFromExisting(existing){
   const pIds = parrainIdsOf(existing);
-  const primaryId = pIds.length > 0 ? pIds[0] : "";
-  const existingParrain = primaryId ? findPerson(primaryId) : null;
+  const currentKids = childrenOf(existing.id).map(k => ({ id: k.id, prenom: k.prenom, nom: k.nom, level: k.level }));
 
   return {
     prenom: existing.prenom || "",
@@ -1328,14 +1323,18 @@ function initJoinFormFromExisting(existing){
     level: existing.level || "1A",
     anneeDiplome: existing.anneeDiplome || "",
     filiere: existing.filiere || "",
-    parrainMode: primaryId ? "choisi" : "aucun",
-    parrainId: primaryId,
-    parrainSearch: existingParrain ? fullName(existingParrain) : "",
-    parrainNonInscrit: { prenom: "", nom: "", level: "1A" },
+    parrainMode: pIds.length > 0 ? "choisi" : "aucun",
+    parrainIds: pIds,
+    parrainsNonInscrits: [],
+    parrainSearch: "",
+    parrainNonInscritTmp: { prenom: "", nom: "", filiere: "", level: "1A", anneeDiplome: "" },
     bdeMembre: existing.bde?.membre || false,
     bdeNom: existing.bde?.nom || "",
     experiences: (existing.experiences || []).map(e => ({...e})),
-    filleulsConnus: [],
+    filleulsConnus: currentKids,
+    filleulsNonInscrits: [],
+    filleulSearch: "",
+    filleulNonInscritTmp: { prenom: "", nom: "", filiere: "", level: "1A", anneeDiplome: "" },
     claimId: null,
     claimDismissed: true,
     errors: {}
@@ -1367,12 +1366,30 @@ function renderRejoindre(){
   } else if (isActuariat) {
     availableLevels = ["1A", "2A", "3A", "Diplômé"];
   }
+
+  // Niveaux pour le parrain non inscrit en cours de saisie
+  const isMasterParrain = f.parrainNonInscritTmp.filiere === "PME-PMI" || f.parrainNonInscritTmp.filiere === "Éco-stat";
+  const isActuParrain = f.parrainNonInscritTmp.filiere === "Actuariat";
+  let parrainLevels = ["1A","2A","3A","Diplômé"];
+  if(isMasterParrain) parrainLevels = ["M1", "M2", "Diplômé"];
+  else if(isActuParrain) parrainLevels = ["1A", "2A", "3A", "Diplômé"];
+
+  // Niveaux pour le filleul non inscrit en cours de saisie
+  const isMasterFilleul = f.filleulNonInscritTmp.filiere === "PME-PMI" || f.filleulNonInscritTmp.filiere === "Éco-stat";
+  const isActuFilleul = f.filleulNonInscritTmp.filiere === "Actuariat";
+  let filleulLevels = ["1A","2A","3A","Diplômé"];
+  if(isMasterFilleul) filleulLevels = ["M1", "M2", "Diplômé"];
+  else if(isActuFilleul) filleulLevels = ["1A", "2A", "3A", "Diplômé"];
   
   const approved = approvedPeople();
-  const matches = f.parrainSearch.trim().length>0
-    ? approved.filter(p => fullName(p).toLowerCase().includes(f.parrainSearch.trim().toLowerCase())).slice(0,8)
+  const parrainMatches = f.parrainSearch.trim().length>0
+    ? approved.filter(p => p.id !== authUser.uid && !f.parrainIds.includes(p.id) && fullName(p).toLowerCase().includes(f.parrainSearch.trim().toLowerCase())).slice(0,8)
     : [];
-  const chosen = f.parrainId ? findPerson(f.parrainId) : null;
+
+  const filleulMatches = f.filleulSearch.trim().length>0
+    ? approved.filter(p => p.id !== authUser.uid && !f.filleulsConnus.some(fk => fk.id === p.id) && fullName(p).toLowerCase().includes(f.filleulSearch.trim().toLowerCase())).slice(0,8)
+    : [];
+
   const claimed = f.claimId ? findPerson(f.claimId) : null;
   const phMatches = (!f.claimId && !f.claimDismissed) ? placeholderMatches(f.prenom, f.nom) : [];
   const realMatches = !claimed ? existingRealMatches(f.prenom, f.nom, authUser.uid) : [];
@@ -1451,8 +1468,6 @@ function renderRejoindre(){
 
         ${claimed ? `<p class="hint">Le parrain est déjà connu grâce à la fiche que tu réclames ci-dessus.</p>` : `
 
-          <p class="hint">Qui t'a parrainé à l'ISFA ? Ça permet de te placer au bon endroit dans l'arbre.</p>
-
           <label class="checkline" style="margin-bottom:12px;">
             <input type="checkbox" id="no-parrain" ${f.parrainMode==='aucun'?'checked':''}>
             Je n'ai pas de parrain (membre fondateur / arrivé autrement)
@@ -1460,46 +1475,56 @@ function renderRejoindre(){
 
           ${f.parrainMode==='aucun' ? "" : `
 
-            ${chosen ? `
-              <div class="parrain-chosen">
-                <span>${esc(fullName(chosen))} — ${esc(chosen.level)}</span>
-                <button type="button" class="btn secondary small" id="clear-parrain">Changer</button>
+            <div class="selected-tags-container" id="parrains-tags">
+              ${f.parrainIds.map(pid => {
+                const pr = findPerson(pid);
+                return pr ? `<span class="tag-pill">${esc(fullName(pr))} (${esc(pr.level)}) <button type="button" class="tag-remove" data-remove-parrain="${pid}">×</button></span>` : "";
+              }).join("")}
+              ${(f.parrainsNonInscrits || []).map((np, idx) => `
+                <span class="tag-pill">${esc(np.prenom)} ${esc(np.nom)} (${esc(np.level)}) <span style="font-size:10px; opacity:0.7;">(non inscrit)</span> <button type="button" class="tag-remove" data-remove-non-inscrit="${idx}">×</button></span>
+              `).join("")}
+            </div>
+
+            <div class="field" style="margin-bottom:8px;">
+              <label>Rechercher un parrain déjà inscrit</label>
+              <input type="text" id="parrain-search" placeholder="Tape le nom de ton parrain inscrit…" value="${esc(f.parrainSearch)}">
+            </div>
+
+            ${parrainMatches.length>0 ? `<div class="search-picker">
+              ${parrainMatches.map(m => `<div class="search-picker-item" data-pick-parrain="${m.id}">${esc(fullName(m))} — ${esc(m.level)}</div>`).join("")}
+            </div>` : (f.parrainSearch.trim() ? `<div class="hint">Aucun résultat dans les membres inscrits.</div>` : "")}
+
+            <div class="subform-box">
+              <div style="font-size:13px; font-weight:600; color:var(--ink); margin-bottom:10px;">Ou ajouter manuellement un parrain non encore inscrit :</div>
+              <div class="row2" style="margin-bottom:10px;">
+                <input type="text" id="non-inscrit-prenom" placeholder="Prénom du parrain" value="${esc(f.parrainNonInscritTmp.prenom)}">
+                <input type="text" id="non-inscrit-nom" placeholder="Nom du parrain" value="${esc(f.parrainNonInscritTmp.nom)}">
               </div>
-
-            ` : f.parrainMode==='futur' ? `
-
-              <div class="row2">
-                <div class="field">
-                  <label>Prénom du futur parrain</label>
-                  <input type="text" id="futur-parrain-prenom" value="${esc(f.parrainNonInscrit.prenom)}" placeholder="Prénom">
+              <div class="row2" style="margin-bottom:10px;">
+                <div class="field" style="margin-bottom:0;">
+                  <label style="font-size:11.5px;">1. Filière</label>
+                  <select id="non-inscrit-filiere" style="padding:9px 11px;">
+                    <option value="" ${!f.parrainNonInscritTmp.filiere?'selected':''}>— Choisir filière —</option>
+                    ${FILIERES.map(fi=>`<option value="${fi}" ${f.parrainNonInscritTmp.filiere===fi?'selected':''}>${fi}</option>`).join("")}
+                  </select>
                 </div>
-                <div class="field">
-                  <label>Nom du futur parrain</label>
-                  <input type="text" id="futur-parrain-nom" value="${esc(f.parrainNonInscrit.nom)}" placeholder="Nom">
+                <div class="field" style="margin-bottom:0;">
+                  <label style="font-size:11.5px;">2. Niveau / Promo</label>
+                  <select id="non-inscrit-level" style="padding:9px 11px;" ${!f.parrainNonInscritTmp.filiere?'disabled':''}>
+                    ${!f.parrainNonInscritTmp.filiere ? '<option value="">— Choisis d\'abord une filière —</option>' : parrainLevels.map(l => `<option value="${l}" ${f.parrainNonInscritTmp.level===l?'selected':''}>${l}</option>`).join("")}
+                  </select>
                 </div>
               </div>
-
-              <div class="field">
-                <label>Niveau du futur parrain</label>
-                <select id="futur-parrain-level">
-                  ${ALL_LEVELS.map(l => `<option value="${l}" ${f.parrainNonInscrit.level===l?'selected':''}>${l}</option>`).join("")}
-                </select>
+              <div style="display:flex; gap:10px; align-items:flex-end;">
+                <div class="field" style="margin-bottom:0; flex:1;">
+                  <label style="font-size:11.5px;">3. Année de diplôme</label>
+                  <input type="number" id="non-inscrit-annee" placeholder="ex : 2025" min="1980" max="2035" value="${esc(f.parrainNonInscritTmp.anneeDiplome)}" style="padding:9px 11px;">
+                </div>
+                <button type="button" class="btn secondary small" id="add-non-inscrit-parrain" style="height:41px;">+ Ajouter ce parrain</button>
               </div>
+            </div>
 
-              <button type="button" class="btn secondary small" id="cancel-futur-parrain">Finalement, mon parrain est inscrit</button>
-
-            ` : `
-
-              <input type="text" id="parrain-search" placeholder="Rechercher ton parrain par nom…" value="${esc(f.parrainSearch)}">
-
-              ${matches.length>0 ? `<div class="search-picker">
-                ${matches.map(m => `<div class="search-picker-item" data-pick-parrain="${m.id}">${esc(fullName(m))} — ${esc(m.level)}</div>`).join("")}
-              </div>` : (f.parrainSearch.trim() ? `<div class="hint">Aucun résultat.</div>` : "")}
-
-              <button type="button" class="btn secondary small" id="future-parrain" style="margin-top:8px;">Mon parrain n'est pas encore inscrit</button>
-
-              ${f.errors.parrainId ? `<div class="error-text">${f.errors.parrainId}</div>` : ""}
-            `}
+            ${f.errors.parrainId ? `<div class="error-text">${f.errors.parrainId}</div>` : ""}
           `}
         `}
       </div>
@@ -1523,18 +1548,54 @@ function renderRejoindre(){
       </div>
 
       <div class="form-section">
-        <h3>Filleuls que tu as parrainés (optionnel)</h3>
-        <div id="filleul-list">
+        <h3>Filleuls que tu as parrainés</h3>
+        
+        <div class="selected-tags-container" id="filleuls-tags">
           ${f.filleulsConnus.map((x,i)=>`
-            <div class="filleul-row">
-              <input type="text" placeholder="Prénom" data-fl="prenom" data-i="${i}" value="${esc(x.prenom)}">
-              <input type="text" placeholder="Nom" data-fl="nom" data-i="${i}" value="${esc(x.nom)}">
-              <select data-fl="level" data-i="${i}">${ALL_LEVELS.map(l=>`<option value="${l}" ${x.level===l?'selected':''}>${l}</option>`).join("")}</select>
-              <button type="button" class="btn secondary small" data-remove-fl="${i}">✕</button>
-            </div>
+            <span class="tag-pill">${esc(x.prenom)} ${esc(x.nom)} (${esc(x.level)}) <button type="button" class="tag-remove" data-remove-fl-idx="${i}">×</button></span>
+          `).join("")}
+          ${(f.filleulsNonInscrits || []).map((x,i)=>`
+            <span class="tag-pill">${esc(x.prenom)} ${esc(x.nom)} (${esc(x.level)}) <span style="font-size:10px; opacity:0.7;">(non inscrit)</span> <button type="button" class="tag-remove" data-remove-fl-non-inscrit="${i}">×</button></span>
           `).join("")}
         </div>
-        <button type="button" class="btn secondary small" id="add-fl">+ Ajouter un filleul</button>
+
+        <div class="field" style="margin-bottom:8px;">
+          <label>Rechercher un filleul déjà inscrit</label>
+          <input type="text" id="filleul-search" placeholder="Tape le nom d'un filleul inscrit pour l'ajouter…" value="${esc(f.filleulSearch)}">
+        </div>
+        ${filleulMatches.length>0 ? `<div class="search-picker">
+          ${filleulMatches.map(m => `<div class="search-picker-item" data-pick-filleul="${m.id}">${esc(fullName(m))} — ${esc(m.level)}</div>`).join("")}
+        </div>` : (f.filleulSearch.trim() ? `<div class="hint">Aucun membre inscrit trouvé.</div>` : "")}
+
+        <div class="subform-box">
+          <div style="font-size:13px; font-weight:600; color:var(--ink); margin-bottom:10px;">Ou ajouter manuellement un filleul non encore inscrit :</div>
+          <div class="row2" style="margin-bottom:10px;">
+            <input type="text" id="fl-non-inscrit-prenom" placeholder="Prénom du filleul" value="${esc(f.filleulNonInscritTmp.prenom)}">
+            <input type="text" id="fl-non-inscrit-nom" placeholder="Nom du filleul" value="${esc(f.filleulNonInscritTmp.nom)}">
+          </div>
+          <div class="row2" style="margin-bottom:10px;">
+            <div class="field" style="margin-bottom:0;">
+              <label style="font-size:11.5px;">1. Filière</label>
+              <select id="fl-non-inscrit-filiere" style="padding:9px 11px;">
+                <option value="" ${!f.filleulNonInscritTmp.filiere?'selected':''}>— Choisir filière —</option>
+                ${FILIERES.map(fi=>`<option value="${fi}" ${f.filleulNonInscritTmp.filiere===fi?'selected':''}>${fi}</option>`).join("")}
+              </select>
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label style="font-size:11.5px;">2. Niveau / Promo</label>
+              <select id="fl-non-inscrit-level" style="padding:9px 11px;" ${!f.filleulNonInscritTmp.filiere?'disabled':''}>
+                ${!f.filleulNonInscritTmp.filiere ? '<option value="">— Choisis d\'abord une filière —</option>' : filleulLevels.map(l => `<option value="${l}" ${f.filleulNonInscritTmp.level===l?'selected':''}>${l}</option>`).join("")}
+              </select>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; align-items:flex-end;">
+            <div class="field" style="margin-bottom:0; flex:1;">
+              <label style="font-size:11.5px;">3. Année de diplôme</label>
+              <input type="number" id="fl-non-inscrit-annee" placeholder="ex : 2027" min="1980" max="2035" value="${esc(f.filleulNonInscritTmp.anneeDiplome)}" style="padding:9px 11px;">
+            </div>
+            <button type="button" class="btn secondary small" id="add-fl-non-inscrit" style="height:41px;">+ Ajouter ce filleul</button>
+          </div>
+        </div>
       </div>
 
       <button type="submit" class="btn" style="margin-top:10px;">${existingRecord ? "Mettre à jour ma fiche" : "Envoyer ma fiche"}</button>
@@ -1574,9 +1635,6 @@ function renderExpEditRow(e,i){
   </div>`;
 }
 
-/* =========================================================================
-   ADMIN
-   ========================================================================= */
 function renderAdmin(){
   if(!isAdmin){
     return `<div class="panel admin-gate">
@@ -1589,6 +1647,12 @@ function renderAdmin(){
   const app = approvedPeople();
   const stats = ALL_LEVELS.map(l => ({l, n: app.filter(p=>p.level===l).length}));
 
+  const isMasterAdminNew = adminNewPerson.filiere === "PME-PMI" || adminNewPerson.filiere === "Éco-stat";
+  const isActuAdminNew = adminNewPerson.filiere === "Actuariat";
+  let adminNewLevels = ["1A","2A","3A","Diplômé"];
+  if(isMasterAdminNew) adminNewLevels = ["M1", "M2", "Diplômé"];
+  else if(isActuAdminNew) adminNewLevels = ["1A", "2A", "3A", "Diplômé"];
+
   return `<div class="panel">
     <div class="section-title">
       <h3>Vue d'ensemble</h3>
@@ -1596,9 +1660,47 @@ function renderAdmin(){
     <div class="stat-grid">
       <div class="stat-card"><div class="num">${app.length}</div><div class="lbl">Membres validés</div></div>
       <div class="stat-card"><div class="num">${pend.length}</div><div class="lbl">En attente</div></div>
-      <div class="stat-card"><div class="num">${ph.length}</div><div class="lbl">Filleuls non réclamés</div></div>
+      <div class="stat-card"><div class="num">${ph.length}</div><div class="lbl">Non inscrits (sur l'arbre)</div></div>
       ${stats.map(s=>`<div class="stat-card"><div class="num">${s.n}</div><div class="lbl">${s.l}</div></div>`).join("")}
     </div>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-bottom:16px;">Créer ou placer un membre / non-inscrit sur l'arbre</h3>
+    <p class="hint">Ajoutez directement un étudiant ou un ancien dans l'arbre avec ou sans parrain, qu'il ait ou non un compte.</p>
+    <div class="row2" style="margin-bottom:10px;">
+      <div class="field" style="margin-bottom:0;"><label>Prénom</label><input type="text" id="admin-new-prenom" value="${esc(adminNewPerson.prenom)}" placeholder="Prénom"></div>
+      <div class="field" style="margin-bottom:0;"><label>Nom</label><input type="text" id="admin-new-nom" value="${esc(adminNewPerson.nom)}" placeholder="Nom"></div>
+    </div>
+    <div class="row2" style="margin-top:10px; margin-bottom:10px;">
+      <div class="field" style="margin-bottom:0;">
+        <label>Filière</label>
+        <select id="admin-new-filiere">
+          <option value="" ${!adminNewPerson.filiere?'selected':''}>— Choisir filière —</option>
+          ${FILIERES.map(fi=>`<option value="${fi}" ${adminNewPerson.filiere===fi?'selected':''}>${fi}</option>`).join("")}
+        </select>
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>Niveau / Promo</label>
+        <select id="admin-new-level" ${!adminNewPerson.filiere?'disabled':''}>
+          ${!adminNewPerson.filiere ? '<option value="">— Choisis d\'abord une filière —</option>' : adminNewLevels.map(l=>`<option ${adminNewPerson.level===l?'selected':''}>${l}</option>`).join("")}
+        </select>
+      </div>
+    </div>
+    <div class="row2" style="margin-top:10px; margin-bottom:14px;">
+      <div class="field" style="margin-bottom:0;">
+        <label>Année de diplôme</label>
+        <input type="number" id="admin-new-annee" placeholder="ex : 2026" min="1980" max="2035" value="${esc(adminNewPerson.anneeDiplome)}">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>Parrain (optionnel - inscrit ou non)</label>
+        <select id="admin-new-parrain">
+          <option value="">— Aucun (Membre fondateur) —</option>
+          ${visiblePeople().map(p=>`<option value="${p.id}" ${adminNewPerson.parrainId===p.id?'selected':''}>${esc(fullName(p))} (${esc(effectiveLevelInfo(p).label)}${p.status==='placeholder'?' - non inscrit':''})</option>`).join("")}
+        </select>
+      </div>
+    </div>
+    <button type="button" class="btn" id="admin-create-person-btn">+ Ajouter à l'arbre</button>
   </div>
 
   <div class="panel">
@@ -1607,12 +1709,13 @@ function renderAdmin(){
   </div>
 
   <div class="panel">
-    <h3 style="margin-bottom:16px;">Filleuls non réclamés (${ph.length})</h3>
+    <h3 style="margin-bottom:16px;">Membres non inscrits sur l'arbre (${ph.length})</h3>
     ${ph.length===0 ? `<div class="empty">Aucun.</div>` : ph.map(p=>`
       <div class="admin-item">
         <div class="admin-item-top">
           <div><strong>${esc(fullName(p))}</strong> — ${esc(p.level)} ${p.status==="placeholder_pending" ? `<span class="pill pending">en attente de validation</span>` : `<span class="pill approved">visible dans l'arbre</span>`} <span class="node-meta">déclaré par ${parrainsOf(p).length ? parrainsOf(p).map(fullName).map(esc).join(", ") : "?"}</span></div>
           <div class="admin-actions">
+            <button class="btn secondary small" data-edit-person="${p.id}">Modifier / Lier</button>
             <button class="btn danger small" data-delete-person="${p.id}">Supprimer</button>
           </div>
         </div>
@@ -1629,7 +1732,7 @@ function renderAdmin(){
         <div class="admin-item-top">
           <div><span class="badge ${info.badgeClass}">${esc(info.label)}</span> <strong>${esc(fullName(p))}</strong> <span class="node-meta">(stocké : ${esc(p.level)}${p.filiere?` · ${esc(p.filiere)}`:""})</span></div>
           <div class="admin-actions">
-            <button class="btn secondary small" data-edit-person="${p.id}">Modifier</button>
+            <button class="btn secondary small" data-edit-person="${p.id}">Modifier / Lier</button>
             <button class="btn danger small" data-delete-person="${p.id}">Supprimer</button>
           </div>
         </div>
@@ -1644,13 +1747,40 @@ function renderAdmin(){
 function renderAdminPendingItem(p){
   const parrains = parrainsOf(p);
   const dup = nameTaken(p.prenom, p.nom, p.id);
+  const existingVersion = findPerson(p.id);
+  const isNewPerson = !existingVersion || existingVersion.status === "placeholder" || existingVersion.status === "placeholder_pending";
+
+  let badgeTypeHtml = isNewPerson 
+    ? `<span class="pill approved" style="margin-left:6px;">✨ Nouvelle inscription</span>` 
+    : `<span class="pill info" style="margin-left:6px;">📝 Modification de fiche</span>`;
+
+  let diffDetailsHtml = "";
+  if(!isNewPerson) {
+    const diffs = [];
+    if(existingVersion.prenom !== p.prenom || existingVersion.nom !== p.nom) diffs.push(`Nom : ${fullName(existingVersion)} → ${fullName(p)}`);
+    if(existingVersion.level !== p.level || existingVersion.anneeDiplome !== p.anneeDiplome) diffs.push(`Niveau/Promo : ${existingVersion.level} (${existingVersion.anneeDiplome}) → ${p.level} (${p.anneeDiplome})`);
+    if(existingVersion.filiere !== p.filiere) diffs.push(`Filière : ${existingVersion.filiere || 'aucune'} → ${p.filiere || 'aucune'}`);
+    
+    const oldPars = parrainIdsOf(existingVersion).sort().join(',');
+    const newPars = parrainIdsOf(p).sort().join(',');
+    if(oldPars !== newPars) diffs.push(`Changement de parrain(s)`);
+
+    if(diffs.length > 0) {
+      diffDetailsHtml = `<div class="node-meta" style="margin-top:6px; color:var(--amber-dark); font-weight:500;">Modifications apportées : ${diffs.join(' · ')}</div>`;
+    } else {
+      diffDetailsHtml = `<div class="node-meta" style="margin-top:6px; font-style:italic;">Mise à jour des informations professionnelles ou autres détails.</div>`;
+    }
+  }
+
   return `<div class="admin-item">
     <div class="admin-item-top">
       <div>
         <strong>${esc(fullName(p))}</strong> — ${esc(p.level)} · diplôme ${esc(p.anneeDiplome)}
+        ${badgeTypeHtml}
         ${dup ? `<span class="pill pending" style="margin-left:6px;">⚠ nom similaire déjà présent</span>` : ""}
       </div>
     </div>
+    ${diffDetailsHtml}
     <div class="node-meta" style="margin-top:6px;">
       Parrain${parrains.length>1?'s déclarés':' déclaré'} : ${parrains.length ? parrains.map(pr=>esc(fullName(pr))+" ("+esc(pr.level)+")").join(", ") : "aucun (fondateur déclaré)"}
       ${p.filiere ? " · filière " + esc(p.filiere) : " · filière non renseignée"}
@@ -1668,16 +1798,19 @@ function renderAdminPendingItem(p){
 function renderAdminEditModal(){
   const p = findPerson(editingId);
   if(!p) return "";
+  const allOtherPeople = visiblePeople().filter(x => x.id !== p.id);
+  const currentChildIds = childrenOf(p.id).map(c => c.id);
+
   return `<div id="edit-modal-backdrop" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:60;">
     <div class="modal-box" style="margin:40px auto;">
       <button class="modal-close" id="close-edit">×</button>
-      <h3 style="margin-bottom:16px;">Modifier — ${esc(fullName(p))}</h3>
+      <h3 style="margin-bottom:16px;">Modifier / Lier — ${esc(fullName(p))} ${p.status==='placeholder'?'(Non inscrit)':''}</h3>
       <div class="row2">
         <div class="field"><label>Prénom</label><input type="text" id="edit-prenom" value="${esc(p.prenom)}"></div>
         <div class="field"><label>Nom</label><input type="text" id="edit-nom" value="${esc(p.nom)}"></div>
       </div>
       <div class="row2">
-        <div class="field"><label>Promo</label><select id="edit-level">${ALL_LEVELS.map(l=>`<option ${p.level===l?'selected':''}>${l}</option>`).join("")}</select></div>
+        <div class="field"><label>Promo / Niveau</label><select id="edit-level">${ALL_LEVELS.map(l=>`<option ${p.level===l?'selected':''}>${l}</option>`).join("")}</select></div>
         <div class="field"><label>Année diplôme</label><input type="number" id="edit-annee" value="${esc(p.anneeDiplome)}"></div>
       </div>
       <div class="field">
@@ -1688,20 +1821,24 @@ function renderAdminEditModal(){
         </select>
       </div>
       <div class="field">
-        <label>Parrain(s)</label>
-        <select id="edit-parrain" multiple size="6">
-          ${approvedPeople().filter(x=>x.id!==p.id).map(x=>`<option value="${x.id}" ${parrainIdsOf(p).includes(x.id)?'selected':''}>${esc(fullName(x))} (${x.level})</option>`).join("")}
+        <label>Parrain(s) (inscrits ou non inscrits sur l'arbre)</label>
+        <select id="edit-parrain" multiple size="5">
+          ${allOtherPeople.map(x=>`<option value="${x.id}" ${parrainIdsOf(p).includes(x.id)?'selected':''}>${esc(fullName(x))} (${esc(effectiveLevelInfo(x).label)}${x.status==='placeholder'?' - non inscrit':''})</option>`).join("")}
         </select>
         <div class="hint" style="margin-top:6px;">Ctrl/Cmd-clic pour sélectionner plusieurs parrains, ou n'en sélectionner aucun.</div>
+      </div>
+      <div class="field">
+        <label>Filleul(s) (inscrits ou non inscrits sur l'arbre)</label>
+        <select id="edit-filleuls" multiple size="5">
+          ${allOtherPeople.map(x=>`<option value="${x.id}" ${currentChildIds.includes(x.id)?'selected':''}>${esc(fullName(x))} (${esc(effectiveLevelInfo(x).label)}${x.status==='placeholder'?' - non inscrit':''})</option>`).join("")}
+        </select>
+        <div class="hint" style="margin-top:6px;">Ctrl/Cmd-clic pour sélectionner les filleuls de cette personne.</div>
       </div>
       <button class="btn" id="save-edit" style="margin-top:10px;">Enregistrer</button>
     </div>
   </div>`;
 }
 
-/* =========================================================================
-   MODAL — profil
-   ========================================================================= */
 function openProfileModal(id){
   if(!authUser){
     const root = $("#modal-root");
@@ -1734,7 +1871,7 @@ function openProfileModal(id){
         <h3>${esc(fullName(p))}</h3>
         <span class="badge ${info.badgeClass}">${esc(info.label)}</span>
       </div>
-      <div class="modal-sub">${isPh ? "Filleul déclaré — n'a pas encore créé sa fiche" : "Diplôme " + esc(p.anneeDiplome)}${p.filiere ? ` · ${esc(p.filiere)}` : ""}${info.label !== p.level ? ` · promo stockée : ${esc(p.level)}` : ""}</div>
+      <div class="modal-sub">${isPh ? "Membre non inscrit sur l'arbre" : "Diplôme " + esc(p.anneeDiplome)}${p.filiere ? ` · ${esc(p.filiere)}` : ""}${info.label !== p.level ? ` · promo stockée : ${esc(p.level)}` : ""}</div>
 
       <div class="modal-block">
         <h4>Famille</h4>
@@ -1769,9 +1906,6 @@ function closeModal(){
   $("#modal-root").innerHTML = "";
 }
 
-/* =========================================================================
-   VALIDATION
-   ========================================================================= */
 function validateJoinForm(f){
   const errors = {};
 
@@ -1786,25 +1920,14 @@ function validateJoinForm(f){
   if(!yr || yr < 1980 || yr > 2035)
     errors.anneeDiplome = "Année invalide.";
 
-  if(!f.claimId && f.parrainMode === "choisi" && !f.parrainId){
+  if(!f.claimId && f.parrainMode === "choisi" && f.parrainIds.length === 0 && (!f.parrainsNonInscrits || f.parrainsNonInscrits.length === 0)){
     errors.parrainId =
-      "Choisis ton parrain dans la liste, indique un futur parrain, ou coche « je n'ai pas de parrain ».";
-  }
-
-  if(!f.claimId && f.parrainMode === "futur"){
-    if(!f.parrainNonInscrit.prenom.trim())
-      errors.parrainId = "Indique le prénom de ton futur parrain.";
-
-    if(!f.parrainNonInscrit.nom.trim())
-      errors.parrainId = "Indique le nom de ton futur parrain.";
+      "Sélectionne au moins un parrain (inscrit ou non inscrit), ou coche « je n'ai pas de parrain ».";
   }
 
   return errors;
 }
 
-/* =========================================================================
-   EVENTS
-   ========================================================================= */
 function attachViewListeners(){
   $$("[data-open-profile]").forEach(el=>{
     el.addEventListener("click", (e)=>{
@@ -1844,9 +1967,9 @@ function attachViewListeners(){
       collapsedIds = new Set(visiblePeople().filter(p=>primaryChildrenOf(p.id).length>0).map(p=>p.id));
       render();
     });
-    $("#tree-zoom-in")?.addEventListener("click", ()=>{ treeZoom = Math.min(2.5, Math.round((treeZoom+0.1)*10)/10); render(); });
-    $("#tree-zoom-out")?.addEventListener("click", ()=>{ treeZoom = Math.max(0.4, Math.round((treeZoom-0.1)*10)/10); render(); });
-    $("#tree-zoom-reset")?.addEventListener("click", ()=>{ treeZoom = 1; render(); });
+    $("#tree-zoom-in")?.addEventListener("click", ()=>{ treeZoom = Math.min(2.0, Math.round((treeZoom+0.15)*100)/100); render(); });
+    $("#tree-zoom-out")?.addEventListener("click", ()=>{ treeZoom = Math.max(0.4, Math.round((treeZoom-0.15)*100)/100); render(); });
+    $("#tree-zoom-reset")?.addEventListener("click", ()=>{ treeZoom = 0.85; render(); });
   }
 
   if(currentTab === "annuaire"){
@@ -1858,6 +1981,31 @@ function attachViewListeners(){
   if(currentTab === "auth") attachAuthListeners();
   if(currentTab === "rejoindre") attachJoinListeners();
   if(currentTab === "admin") attachAdminListeners();
+}
+
+function getFriendlyAuthErrorMessage(errorCode) {
+  switch (errorCode) {
+    case 'auth/invalid-email':
+      return "L'adresse email saisie n'est pas valide.";
+    case 'auth/user-disabled':
+      return "Ce compte utilisateur a été désactivé.";
+    case 'auth/user-not-found':
+      return "Aucun compte ne correspond à cet email. Vérifie tes identifiants ou crée un compte.";
+    case 'auth/wrong-password':
+      return "Mot de passe incorrect. Vérifie ta saisie.";
+    case 'auth/email-already-in-use':
+      return "Un compte existe déjà avec cette adresse email.";
+    case 'auth/weak-password':
+      return "Le mot de passe est trop faible (6 caractères minimum requis).";
+    case 'auth/operation-not-allowed':
+      return "L'authentification par email/mot de passe n'est pas activée.";
+    case 'auth/network-request-failed':
+      return "Erreur réseau. Vérifie ta connexion internet.";
+    case 'auth/too-many-requests':
+      return "Trop de tentatives infructueuses. Réessaie plus tard.";
+    default:
+      return "Erreur d'authentification : " + errorCode;
+  }
 }
 
 function attachAuthListeners() {
@@ -1911,7 +2059,7 @@ function attachAuthListeners() {
         await firebase.auth().signInWithEmailAndPassword(email, password);
       }
     } catch (e) {
-      errEl.textContent = "Erreur : " + e.message;
+      errEl.textContent = getFriendlyAuthErrorMessage(e.code);
     }
   });
 
@@ -1926,10 +2074,10 @@ function attachAuthListeners() {
     }
     try {
       await firebase.auth().sendPasswordResetEmail(email);
-      succEl.textContent = "Un e-mail de réinitialisation a été envoyé à " + email + ". Vérifie ta boîte de réception.";
+      succEl.textContent = "Un e-mail de réinitialisation a été envoyé à " + email + ". Pense à vérifier tes spams si tu ne le vois pas dans ta boîte de réception.";
       succEl.style.display = "block";
     } catch (e) {
-      errEl.textContent = "Erreur : " + e.message;
+      errEl.textContent = getFriendlyAuthErrorMessage(e.code);
     }
   });
 }
@@ -2014,6 +2162,14 @@ function attachJoinListeners(){
     const formattedPrenom = formatName(f.prenom);
     const formattedNom = formatName(f.nom);
 
+    let parrainIdsList = [...f.parrainIds];
+    if(f.parrainMode === "choisi" && f.parrainsNonInscrits && f.parrainsNonInscrits.length > 0){
+      f.parrainsNonInscrits.forEach(np => {
+        const ph = findOrCreatePlaceholder(np.prenom, np.nom, np.level, np.filiere, np.anneeDiplome, authUser.uid);
+        if(!parrainIdsList.includes(ph.id)) parrainIdsList.push(ph.id);
+      });
+    }
+
     if(claimTarget && (claimTarget.status === "placeholder" || claimTarget.status === "placeholder_pending")){
       claimTarget.id = authUser.uid; 
       claimTarget.prenom = formattedPrenom;
@@ -2023,6 +2179,7 @@ function attachJoinListeners(){
       claimTarget.filiere = FILIERES.includes(f.filiere) ? f.filiere : "";
       claimTarget.bde = { membre: f.bdeMembre, nom: f.bdeMembre ? f.bdeNom.trim() : "" };
       claimTarget.experiences = f.experiences.map(x=>({...x}));
+      claimTarget.parrainIds = parrainIdsList;
       claimTarget.status = "pending";
       claimTarget.pendingSourceIds = [];
       claimTarget.submittedAt = new Date().toISOString();
@@ -2035,39 +2192,12 @@ function attachJoinListeners(){
       existingRecord.filiere = FILIERES.includes(f.filiere) ? f.filiere : "";
       existingRecord.bde = { membre: f.bdeMembre, nom: f.bdeMembre ? f.bdeNom.trim() : "" };
       existingRecord.experiences = f.experiences.map(x=>({...x}));
-
-      let parrainId = null;
-      if(f.parrainMode === "choisi") parrainId = f.parrainId || null;
-      if(f.parrainMode === "futur"){
-        const futurParrain = findOrCreatePlaceholder(f.parrainNonInscrit.prenom, f.parrainNonInscrit.nom, f.parrainNonInscrit.level, authUser.uid);
-        parrainId = futurParrain.id;
-      }
-      existingRecord.parrainIds = parrainId ? [parrainId] : [];
+      existingRecord.parrainIds = parrainIdsList;
       existingRecord.status = "pending"; 
       existingRecord.submittedAt = new Date().toISOString();
       person = existingRecord;
     } else {
       const newId = authUser.uid; 
-      let parrainId = null;
-
-      if(f.parrainMode === "choisi"){
-        parrainId = f.parrainId || null;
-      }
-
-      if(f.parrainMode === "futur"){
-        const futurParrain = findOrCreatePlaceholder(
-          f.parrainNonInscrit.prenom,
-          f.parrainNonInscrit.nom,
-          f.parrainNonInscrit.level,
-          newId
-        );
-        parrainId = futurParrain.id;
-      }
-
-      if(f.parrainMode === "aucun"){
-        parrainId = null;
-      }
-
       person = {
         id: newId,
         prenom: formattedPrenom,
@@ -2075,7 +2205,7 @@ function attachJoinListeners(){
         level: f.level,
         anneeDiplome: parseInt(f.anneeDiplome,10),
         filiere: FILIERES.includes(f.filiere) ? f.filiere : "",
-        parrainIds: parrainId ? [parrainId] : [],
+        parrainIds: parrainIdsList,
         bde: {
           membre: f.bdeMembre,
           nom: f.bdeMembre ? f.bdeNom.trim() : ""
@@ -2090,8 +2220,18 @@ function attachJoinListeners(){
     }
 
     (f.filleulsConnus || []).forEach(fl => {
-      if(!fl.prenom.trim() || !fl.nom.trim()) return;
-      attachFilleul(fl.prenom, fl.nom, fl.level, person.id, person.id);
+      if(fl.id) {
+        const childPerson = findPerson(fl.id);
+        if(childPerson) {
+          addParrainId(childPerson, person.id);
+        }
+      }
+    });
+
+    (f.filleulsNonInscrits || []).forEach(fl => {
+      if(fl.prenom && fl.nom) {
+        attachFilleul(fl.prenom, fl.nom, fl.level, fl.filiere, fl.anneeDiplome, person.id, person.id);
+      }
     });
 
     await savePeople();
@@ -2103,32 +2243,136 @@ function attachJoinListeners(){
 
   $("#no-parrain")?.addEventListener("change", e=>{
     f.parrainMode = e.target.checked ? "aucun" : "choisi";
-    f.parrainId=""; f.parrainSearch="";
+    f.parrainIds = []; f.parrainsNonInscrits = []; f.parrainSearch="";
     syncFormFields(); render();
   });
-  $("#future-parrain")?.addEventListener("click", ()=>{
-    syncFormFields();
-    f.parrainMode = "futur";
-    f.parrainId = "";
-    f.parrainSearch = "";
-    render();
-  });
-  $("#cancel-futur-parrain")?.addEventListener("click", ()=>{
-    syncFormFields();
-    f.parrainMode = "choisi";
-    f.parrainNonInscrit = { prenom:"", nom:"", level:"1A" };
-    render();
-  });
+  
   $("#parrain-search")?.addEventListener("input", e=>{
     f.parrainSearch = e.target.value; syncFormFields(); render();
     setTimeout(()=>{ const el=$("#parrain-search"); if(el){ el.focus(); el.selectionStart = el.value.length; } },0);
   });
   $$("[data-pick-parrain]").forEach(el=>{
     el.addEventListener("click", ()=>{
-      f.parrainId = el.dataset.pickParrain; f.parrainSearch=""; syncFormFields(); render();
+      const pid = el.dataset.pickParrain;
+      if(!f.parrainIds.includes(pid)) f.parrainIds.push(pid);
+      f.parrainSearch=""; 
+      syncFormFields(); render();
     });
   });
-  $("#clear-parrain")?.addEventListener("click", ()=>{ f.parrainId=""; syncFormFields(); render(); });
+  $$("[data-remove-parrain]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const pid = el.dataset.removeParrain;
+      f.parrainIds = f.parrainIds.filter(id => id !== pid);
+      syncFormFields(); render();
+    });
+  });
+
+  $("#non-inscrit-prenom")?.addEventListener("input", e => { f.parrainNonInscritTmp.prenom = e.target.value; });
+  $("#non-inscrit-nom")?.addEventListener("input", e => { f.parrainNonInscritTmp.nom = e.target.value; });
+  $("#non-inscrit-filiere")?.addEventListener("change", e => {
+    f.parrainNonInscritTmp.filiere = e.target.value;
+    const isMaster = f.parrainNonInscritTmp.filiere === "PME-PMI" || f.parrainNonInscritTmp.filiere === "Éco-stat";
+    const isActu = f.parrainNonInscritTmp.filiere === "Actuariat";
+    let available = ["1A","2A","3A","Diplômé"];
+    if(isMaster) available = ["M1", "M2", "Diplômé"];
+    else if(isActu) available = ["1A", "2A", "3A", "Diplômé"];
+    f.parrainNonInscritTmp.level = available[0];
+    render();
+  });
+  $("#non-inscrit-level")?.addEventListener("change", e => { f.parrainNonInscritTmp.level = e.target.value; });
+  $("#non-inscrit-annee")?.addEventListener("input", e => { f.parrainNonInscritTmp.anneeDiplome = e.target.value; });
+
+  $("#add-non-inscrit-parrain")?.addEventListener("click", () => {
+    syncFormFields();
+    const p = f.parrainNonInscritTmp.prenom.trim();
+    const n = f.parrainNonInscritTmp.nom.trim();
+    const fil = f.parrainNonInscritTmp.filiere;
+    const yr = f.parrainNonInscritTmp.anneeDiplome;
+    if(p && n && fil && yr) {
+      if(!f.parrainsNonInscrits) f.parrainsNonInscrits = [];
+      f.parrainsNonInscrits.push({ prenom: p, nom: n, filiere: fil, level: f.parrainNonInscritTmp.level, anneeDiplome: yr });
+      f.parrainNonInscritTmp = { prenom: "", nom: "", filiere: "", level: "1A", anneeDiplome: "" };
+      render();
+    } else {
+      alert("Veuillez renseigner tous les champs du parrain (prénom, nom, filière, niveau et année de diplôme).");
+    }
+  });
+
+  $$("[data-remove-non-inscrit]").forEach(el => {
+    el.addEventListener("click", () => {
+      syncFormFields();
+      const idx = parseInt(el.dataset.removeNonInscrit, 10);
+      f.parrainsNonInscrits.splice(idx, 1);
+      render();
+    });
+  });
+
+  $("#filleul-search")?.addEventListener("input", e=>{
+    f.filleulSearch = e.target.value; syncFormFields(); render();
+    setTimeout(()=>{ const el=$("#filleul-search"); if(el){ el.focus(); el.selectionStart = el.value.length; } },0);
+  });
+  $$("[data-pick-filleul]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const fid = el.dataset.pickFilleul;
+      const targetP = findPerson(fid);
+      if(targetP && !f.filleulsConnus.some(fk => fk.id === fid)){
+        f.filleulsConnus.push({ id: targetP.id, prenom: targetP.prenom, nom: targetP.nom, level: targetP.level });
+      }
+      f.filleulSearch = "";
+      syncFormFields(); render();
+    });
+  });
+  $$("[data-remove-fl-idx]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const idx = parseInt(el.dataset.removeFlIdx, 10);
+      f.filleulsConnus.splice(idx, 1);
+      syncFormFields(); render();
+    });
+  });
+
+  $("#fl-non-inscrit-prenom")?.addEventListener("input", e => { f.filleulNonInscritTmp.prenom = e.target.value; });
+  $("#fl-non-inscrit-nom")?.addEventListener("input", e => { f.filleulNonInscritTmp.nom = e.target.value; });
+  $("#fl-non-inscrit-filiere")?.addEventListener("change", e => {
+    f.filleulNonInscritTmp.filiere = e.target.value;
+    const isMaster = f.filleulNonInscritTmp.filiere === "PME-PMI" || f.filleulNonInscritTmp.filiere === "Éco-stat";
+    const isActu = f.filleulNonInscritTmp.filiere === "Actuariat";
+    let available = ["1A","2A","3A","Diplômé"];
+    if(isMaster) available = ["M1", "M2", "Diplômé"];
+    else if(isActu) available = ["1A", "2A", "3A", "Diplômé"];
+    f.filleulNonInscritTmp.level = available[0];
+    render();
+  });
+  $("#fl-non-inscrit-level")?.addEventListener("change", e => { f.filleulNonInscritTmp.level = e.target.value; });
+  $("#fl-non-inscrit-annee")?.addEventListener("input", e => { f.filleulNonInscritTmp.anneeDiplome = e.target.value; });
+
+  $("#add-fl-non-inscrit")?.addEventListener("click", () => {
+    syncFormFields();
+    const p = f.filleulNonInscritTmp.prenom.trim();
+    const n = f.filleulNonInscritTmp.nom.trim();
+    const fil = f.filleulNonInscritTmp.filiere;
+    const yr = f.filleulNonInscritTmp.anneeDiplome;
+    if(p && n && fil && yr) {
+      if(!f.filleulsNonInscrits) f.filleulsNonInscrits = [];
+      if(f.filleulsConnus.length + f.filleulsNonInscrits.length >= MAX_FILLEULS_DECLARES){
+        alert("Maximum " + MAX_FILLEULS_DECLARES + " filleuls déclarés par fiche.");
+        return;
+      }
+      f.filleulsNonInscrits.push({ prenom: p, nom: n, filiere: fil, level: f.filleulNonInscritTmp.level, anneeDiplome: yr });
+      f.filleulNonInscritTmp = { prenom: "", nom: "", filiere: "", level: "1A", anneeDiplome: "" };
+      render();
+    } else {
+      alert("Veuillez renseigner tous les champs du filleul (prénom, nom, filière, niveau et année de diplôme).");
+    }
+  });
+
+  $$("[data-remove-fl-non-inscrit]").forEach(el => {
+    el.addEventListener("click", () => {
+      syncFormFields();
+      const idx = parseInt(el.dataset.removeFlNonInscrit, 10);
+      f.filleulsNonInscrits.splice(idx, 1);
+      render();
+    });
+  });
 
   $("#bde-membre")?.addEventListener("change", e=>{ f.bdeMembre = e.target.checked; syncFormFields(); render(); });
 
@@ -2144,19 +2388,6 @@ function attachJoinListeners(){
   $$("[data-remove-exp]").forEach(el=>{
     el.addEventListener("click", ()=>{ syncFormFields(); f.experiences.splice(parseInt(el.dataset.removeExp,10),1); render(); });
   });
-
-  $("#add-fl")?.addEventListener("click", ()=>{
-    syncFormFields();
-    if(f.filleulsConnus.length >= MAX_FILLEULS_DECLARES){
-      alert("Maximum " + MAX_FILLEULS_DECLARES + " filleuls déclarés par fiche.");
-      return;
-    }
-    f.filleulsConnus.push({prenom:"",nom:"",level:"1A"});
-    render();
-  });
-  $$("[data-remove-fl]").forEach(el=>{
-    el.addEventListener("click", ()=>{ syncFormFields(); f.filleulsConnus.splice(parseInt(el.dataset.removeFl,10),1); render(); });
-  });
 }
 function syncFormFields(){
   const f = joinForm;
@@ -2167,27 +2398,63 @@ function syncFormFields(){
   if($("[name=anneeDiplome]")) f.anneeDiplome = g("[name=anneeDiplome]");
   if($("[name=filiere]")) f.filiere = g("[name=filiere]");
   if($("#bde-nom")) f.bdeNom = g("#bde-nom");
-  if($("#futur-parrain-prenom"))
-    f.parrainNonInscrit.prenom = g("#futur-parrain-prenom");
-  if($("#futur-parrain-nom"))
-    f.parrainNonInscrit.nom = g("#futur-parrain-nom");
-  if($("#futur-parrain-level"))
-    f.parrainNonInscrit.level = g("#futur-parrain-level");
+  
+  if($("#non-inscrit-prenom")) f.parrainNonInscritTmp.prenom = g("#non-inscrit-prenom");
+  if($("#non-inscrit-nom")) f.parrainNonInscritTmp.nom = g("#non-inscrit-nom");
+  if($("#non-inscrit-filiere")) f.parrainNonInscritTmp.filiere = g("#non-inscrit-filiere");
+  if($("#non-inscrit-level")) f.parrainNonInscritTmp.level = g("#non-inscrit-level");
+  if($("#non-inscrit-annee")) f.parrainNonInscritTmp.anneeDiplome = g("#non-inscrit-annee");
+
+  if($("#fl-non-inscrit-prenom")) f.filleulNonInscritTmp.prenom = g("#fl-non-inscrit-prenom");
+  if($("#fl-non-inscrit-nom")) f.filleulNonInscritTmp.nom = g("#fl-non-inscrit-nom");
+  if($("#fl-non-inscrit-filiere")) f.filleulNonInscritTmp.filiere = g("#fl-non-inscrit-filiere");
+  if($("#fl-non-inscrit-level")) f.filleulNonInscritTmp.level = g("#fl-non-inscrit-level");
+  if($("#fl-non-inscrit-annee")) f.filleulNonInscritTmp.anneeDiplome = g("#fl-non-inscrit-annee");
+
   $$("[data-exp]").forEach(el=>{
     const i = parseInt(el.dataset.i,10);
     const field = el.dataset.exp;
     if(!f.experiences[i]) return;
     f.experiences[i][field] = field==="visible" ? el.checked : el.value;
   });
-  $$("[data-fl]").forEach(el=>{
-    const i = parseInt(el.dataset.i,10);
-    const field = el.dataset.fl;
-    if(!f.filleulsConnus[i]) return;
-    f.filleulsConnus[i][field] = el.value;
-  });
 }
 
 function attachAdminListeners(){
+  $("#admin-new-prenom")?.addEventListener("input", e => { adminNewPerson.prenom = e.target.value; });
+  $("#admin-new-nom")?.addEventListener("input", e => { adminNewPerson.nom = e.target.value; });
+  $("#admin-new-filiere")?.addEventListener("change", e => {
+    adminNewPerson.filiere = e.target.value;
+    const isMaster = adminNewPerson.filiere === "PME-PMI" || adminNewPerson.filiere === "Éco-stat";
+    const isActu = adminNewPerson.filiere === "Actuariat";
+    let available = ["1A","2A","3A","Diplômé"];
+    if(isMaster) available = ["M1", "M2", "Diplômé"];
+    else if(isActu) available = ["1A", "2A", "3A", "Diplômé"];
+    adminNewPerson.level = available[0];
+    render();
+  });
+  $("#admin-new-level")?.addEventListener("change", e => { adminNewPerson.level = e.target.value; });
+  $("#admin-new-annee")?.addEventListener("input", e => { adminNewPerson.anneeDiplome = e.target.value; });
+  $("#admin-new-parrain")?.addEventListener("change", e => { adminNewPerson.parrainId = e.target.value; });
+
+  $("#admin-create-person-btn")?.addEventListener("click", async () => {
+    const p = formatName(adminNewPerson.prenom);
+    const n = formatName(adminNewPerson.nom);
+    const fil = adminNewPerson.filiere;
+    const yr = adminNewPerson.anneeDiplome;
+    if(!p || !n || !fil || !yr){
+      alert("Veuillez renseigner tous les champs (prénom, nom, filière, niveau et année de diplôme).");
+      return;
+    }
+    const created = findOrCreatePlaceholder(p, n, adminNewPerson.level, fil, yr);
+    created.status = "placeholder";
+    if(adminNewPerson.parrainId) {
+      addParrainId(created, adminNewPerson.parrainId);
+    }
+    await savePeople();
+    adminNewPerson = { prenom: "", nom: "", filiere: "", level: "1A", anneeDiplome: "", parrainId: "" };
+    render();
+  });
+
   $$("[data-approve]").forEach(el=>{
     el.addEventListener("click", async ()=>{
       const p = findPerson(el.dataset.approve);
@@ -2221,6 +2488,7 @@ function attachAdminListeners(){
   });
   $("#close-edit")?.addEventListener("click", ()=>{ editingId=null; render(); });
   $("#edit-modal-backdrop")?.addEventListener("click", (e)=>{ if(e.target.id==="edit-modal-backdrop"){ editingId=null; render(); } });
+  
   $("#save-edit")?.addEventListener("click", async ()=>{
     const p = findPerson(editingId);
     if(!p) return;
@@ -2230,12 +2498,26 @@ function attachAdminListeners(){
     p.anneeDiplome = $("#edit-annee").value;
     const editedFiliere = $("#edit-filiere")?.value || "";
     p.filiere = FILIERES.includes(editedFiliere) ? editedFiliere : "";
+    
     const selectedParrainIds = Array.from($("#edit-parrain").selectedOptions).map(o=>o.value);
-    const keptInOrder = parrainIdsOf(p).filter(id => selectedParrainIds.includes(id));
-    const newlyAdded = selectedParrainIds.filter(id => !keptInOrder.includes(id));
-    p.parrainIds = [...keptInOrder, ...newlyAdded];
+    p.parrainIds = [...selectedParrainIds];
+
+    const selectedFilleulIds = Array.from($("#edit-filleuls").selectedOptions).map(o=>o.value);
+    people.forEach(other => {
+      if(other.id === p.id) return;
+      const isSelectedAsChild = selectedFilleulIds.includes(other.id);
+      const isCurrentlyChild = parrainIdsOf(other).includes(p.id);
+      
+      if(isSelectedAsChild && !isCurrentlyChild) {
+        addParrainId(other, p.id);
+      } else if(!isSelectedAsChild && isCurrentlyChild) {
+        other.parrainIds = parrainIdsOf(other).filter(pid => pid !== p.id);
+      }
+    });
+
     editingId = null;
-    await savePeople(); render();
+    await savePeople(); 
+    render();
   });
 }
 
@@ -2250,9 +2532,6 @@ document.addEventListener("click", (e)=>{
   if(e.target.closest("[data-close-modal]")) closeModal();
 });
 
-/* =========================================================================
-   INIT
-   ========================================================================= */
 (async function init(){
   $("#view").innerHTML = `<div class="empty">Chargement de l'arbre…</div>`;
   await loadPeople();
